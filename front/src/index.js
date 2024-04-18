@@ -29,12 +29,16 @@ import Login from "views/examples/Login.js";
 import Profile from "views/examples/Profile.js";
 import Register from "views/examples/Register.js";
 
+// Nuevas routes - APIS
+
+import LandingPage from "views/LandingPage.js"
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <BrowserRouter>
     <Routes>
-      <Route path="/" exact element={<Index />} />
+      <Route path="/" exact element={<LandingPage />} />
       <Route path="/landing-page" exact element={<Landing />} />
       <Route path="/login-page" exact element={<Login />} />
       <Route path="/profile-page" exact element={<Profile />} />
