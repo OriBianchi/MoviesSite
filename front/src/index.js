@@ -25,13 +25,13 @@ import "assets/scss/argon-design-system-react.scss?v1.1.0";
 
 import Index from "views/Index.js";
 import Landing from "views/examples/Landing.js";
-import Login from "views/examples/Login.js";
 import Profile from "views/examples/Profile.js";
-import Register from "views/examples/Register.js";
 
 // Nuevas routes - APIS
 
-import LandingPage from "views/LandingPage.js"
+import LandingPage from "views/LandingPage.js";
+import Register from "views/Register.js";
+import Login from "views/Login.js";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -42,7 +42,8 @@ root.render(
       <Route path="/landing-page" exact element={<Landing />} />
       <Route path="/login-page" exact element={<Login />} />
       <Route path="/profile-page" exact element={<Profile />} />
-      <Route path="/register-page" exact element={<Register />} />
+      <Route path="/register" exact element={<Register />} />
+      <Route path="/login" exact element={<Login />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   </BrowserRouter>

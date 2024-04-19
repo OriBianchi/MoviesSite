@@ -261,8 +261,7 @@ class NavBar_LoggedOut extends React.Component {
                     <Button
                       className="btn-neutral btn-icon"
                       color="default"
-                      href=""
-                      target="_blank"
+                      href="/register"
                     >
                       <span className="nav-link-inner--text ml-1">
                         Registro
@@ -271,8 +270,7 @@ class NavBar_LoggedOut extends React.Component {
                     <Button
                       className="btn-1 ml-1"
                       color="primary"
-                      href=""
-                      target="_blank"
+                      href="/login"
                     >
                       <span className="nav-link-inner--text ml-1">
                         Iniciar sesión
