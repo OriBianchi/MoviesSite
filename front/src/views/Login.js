@@ -66,7 +66,7 @@ class Login extends React.Component {
                   <Card className="bg-secondary shadow border-0">
                     <CardBody className="px-lg-5 py-lg-5">
                       <div className="text-center text-muted mb-4">
-                        <small>Ingresa con tu correo y contraseña</small>
+                        <big>Inicia sesión!</big>
                       </div>
                       <Form role="form">
                         <FormGroup className="mb-3">
@@ -93,18 +93,10 @@ class Login extends React.Component {
                             />
                           </InputGroup>
                         </FormGroup>
-                        <div className="custom-control custom-control-alternative custom-checkbox">
-                          <input
-                            className="custom-control-input"
-                            id=" customCheckLogin"
-                            type="checkbox"
-                          />
-                          <label
-                            className="custom-control-label"
-                            htmlFor=" customCheckLogin"
-                          >
-                            <span>Recuérdame</span>
-                          </label>
+                        <div className="text-muted font-italic">
+                          <small>
+                          <a href="/register">Olvidaste tu contraseña?</a>
+                          </small>
                         </div>
                         <div className="text-center">
                           <Button
@@ -115,6 +107,8 @@ class Login extends React.Component {
                             Ingresar
                           </Button>
                         </div>
+                        
+                      <div className="text-center"><p>Nuevo en Cinefilia? <a href="/register">Crea tu cuenta</a></p></div>
                       </Form>
                     </CardBody>
                   </Card>
