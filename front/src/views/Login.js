@@ -111,6 +111,7 @@ class Login extends React.Component {
                             className="my-4"
                             color="primary"
                             type="button"
+                            href="/main-page"
                           >
                             Ingresar
                           </Button>
