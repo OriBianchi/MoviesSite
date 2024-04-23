@@ -17,7 +17,7 @@
 */
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate} from "react-router-dom";
 
 import "assets/vendor/nucleo/css/nucleo.css";
 import "assets/vendor/font-awesome/css/font-awesome.min.css";
@@ -33,20 +33,21 @@ import MainPage from "views/MainPage.js";
 import Profile from "views/Profile";
 import SearchResults from "views/SearchResults";
 
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <BrowserRouter>
     <Routes>
-      <Route path="/" exact element={<LandingPage />} />
-      <Route path="/main-page" exact element={<MainPage />} />
-      <Route path="/landing-page" exact element={<Landing />} />
-      <Route path="/login-page" exact element={<Login />} />
-      <Route path="/profile-page" exact element={<Profile />} />
-      <Route path="/register" exact element={<Register />} />
-      <Route path="/login" exact element={<Login />} />
-      <Route path="/search-results" exact element={<SearchResults />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/" exact element={<LandingPage />} />
+        <Route path="/main-page" exact element={<MainPage />} />
+        <Route path="/landing-page" exact element={<Landing />} />
+        <Route path="/login-page" exact element={<Login />} />
+        <Route path="/profile-page" exact element={<Profile />} />
+        <Route path="/register" exact element={<Register />} />
+        <Route path="/login" exact element={<Login />} />
+        <Route path="/search-results" exact element={<SearchResults />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   </BrowserRouter>
 );
