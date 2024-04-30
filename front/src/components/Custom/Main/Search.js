@@ -45,7 +45,7 @@ class Search extends React.Component {
                 <Row className="align-items-center justify-content-center">
                   <Col className="text-center" lg="7">
                     <p className="lead text-white">
-                      Qué película estás buscando?
+                    ¿Qué película estás buscando?
                     </p>
                       <FormGroup
                         className={classnames({

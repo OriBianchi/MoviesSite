@@ -21,7 +21,7 @@ class MovieCards extends React.Component {
     fetch('https://api.themoviedb.org/3/movie/top_rated?api_key=73a2526073ff49d6c8aa48eba5e42531')
       .then(response => response.json())
       .then(data => {
-        this.setState({ movies: data.results.slice(0, 20) });
+        this.setState({ movies: data.results.slice(0, 18) });
       })
       .catch(error => console.log('Error fetching data:', error));
   }
