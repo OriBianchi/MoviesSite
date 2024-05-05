@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+.movie-card {
+    position: relative;
+    font-family: 'Poppins', sans-serif;
+    text-decoration: none;
+    color: black;
+}
+
+.movie-title {
+    font-weight: 500;
+}
+
+a, a:hover { color: inherit; } 
+
+.movie-card:hover .overlay {
+    opacity: 1;
+}
+

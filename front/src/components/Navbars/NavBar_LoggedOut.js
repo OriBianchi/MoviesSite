@@ -66,6 +66,9 @@ class NavBar_LoggedOut extends React.Component {
     return (
       <>
         <header className="header-global">
+        <title>
+     Cinefilia
+    </title>
           <Navbar
             className="navbar-main navbar-transparent navbar-dark headroom"
             expand="lg"
@@ -193,70 +196,7 @@ class NavBar_LoggedOut extends React.Component {
                   </UncontrolledDropdown>
                 </Nav> */}
                 <Nav className="align-items-lg-center ml-lg-auto" navbar>
-                  <NavItem>
-                    <NavLink
-                      className="nav-link-icon"
-                      href="https://www.facebook.com/creativetim"
-                      id="tooltip333589074"
-                      target="_blank"
-                    >
-                      <i className="fa fa-facebook-square" />
-                      <span className="nav-link-inner--text d-lg-none ml-2">
-                        Facebook
-                      </span>
-                    </NavLink>
-                    <UncontrolledTooltip delay={0} target="tooltip333589074">
-                      Seguinos en Facebook
-                    </UncontrolledTooltip>
-                  </NavItem>
-                  <NavItem>
-                    <NavLink
-                      className="nav-link-icon"
-                      href="https://www.instagram.com/creativetimofficial"
-                      id="tooltip356693867"
-                      target="_blank"
-                    >
-                      <i className="fa fa-instagram" />
-                      <span className="nav-link-inner--text d-lg-none ml-2">
-                        Instagram
-                      </span>
-                    </NavLink>
-                    <UncontrolledTooltip delay={0} target="tooltip356693867">
-                      Seguinos en Instagram
-                    </UncontrolledTooltip>
-                  </NavItem>
-                  <NavItem>
-                    <NavLink
-                      className="nav-link-icon"
-                      href="https://twitter.com/creativetim"
-                      id="tooltip184698705"
-                      target="_blank"
-                    >
-                      <i className="fa fa-twitter-square" />
-                      <span className="nav-link-inner--text d-lg-none ml-2">
-                        Twitter
-                      </span>
-                    </NavLink>
-                    <UncontrolledTooltip delay={0} target="tooltip184698705">
-                      Seguinos en Twitter
-                    </UncontrolledTooltip>
-                  </NavItem>
-                  <NavItem>
-                    <NavLink
-                      className="nav-link-icon"
-                      href=""
-                      id="tooltip112445449"
-                      target="_blank"
-                    >
-                      <i className="fa fa-linkedin" />
-                      <span className="nav-link-inner--text d-lg-none ml-2">
-                        Linkedin
-                      </span>
-                    </NavLink>
-                    <UncontrolledTooltip delay={0} target="tooltip112445449">
-                      Conectemos en Linkedin
-                    </UncontrolledTooltip>
-                  </NavItem>
+                  
                   <NavItem className="d-none d-lg-block ml-lg-4">
                     <Button
                       className="btn-neutral btn-icon"
@@ -281,6 +221,7 @@ class NavBar_LoggedOut extends React.Component {
               </UncontrolledCollapse>
             </Container>
           </Navbar>
+          
         </header>
       </>
     );

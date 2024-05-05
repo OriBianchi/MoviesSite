@@ -13,7 +13,7 @@
 =========================================================
 
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
+z
 */
 import React from "react";
 import ReactDOM from "react-dom/client";
@@ -31,7 +31,7 @@ import Register from "views/Register.js";
 import Login from "views/Login.js";
 import MainPage from "views/MainPage.js";
 import Profile from "views/Profile";
-import SearchResults from "views/SearchResults";
+import Buscar from "views/Buscar.js";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -45,7 +45,7 @@ root.render(
       <Route path="/profile-page" exact element={<Profile />} />
       <Route path="/register" exact element={<Register />} />
       <Route path="/login" exact element={<Login />} />
-      <Route path="/search-results" exact element={<SearchResults />} />
+      <Route path="/buscar" exact element={<Buscar />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   </BrowserRouter>
