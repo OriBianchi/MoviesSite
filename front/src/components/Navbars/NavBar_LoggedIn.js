@@ -111,14 +111,34 @@ class NavBar_LoggedIn extends React.Component {
                   <UncontrolledDropdown nav>
                     <DropdownToggle nav>
                       <i className="ni ni-collection d-lg-none mr-1" />
-                      <span className="nav-link-inner--text">Tus películas</span>
+                      <span className="nav-link-inner--text">Series</span>
+                    </DropdownToggle>
+                    <DropdownMenu className="dropdown-menu-right">
+                      <DropdownItem to="/buscar" tag={Link}>
+                        Buscar
+                      </DropdownItem>
+                      <DropdownItem to="/por-genero" tag={Link}>
+                        Por géneros
+                      </DropdownItem>
+                      <DropdownItem to="/por-pais" tag={Link}>
+                        Por país
+                      </DropdownItem>
+                      <DropdownItem to="/top-10" tag={Link}>
+                        Top 10
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </UncontrolledDropdown>
+                  <UncontrolledDropdown nav>
+                    <DropdownToggle nav>
+                      <i className="ni ni-collection d-lg-none mr-1" />
+                      <span className="nav-link-inner--text">Tus listas</span>
                     </DropdownToggle>
                     <DropdownMenu className="dropdown-menu-right">
                       <DropdownItem to="/tus-listas" tag={Link}>
-                        Tus listas
+                        Favoritas
                       </DropdownItem>
                       <DropdownItem to="/tus-favoritas" tag={Link}>
-                        Tus favoritas
+                        Películas
                       </DropdownItem>
                     </DropdownMenu>
                   </UncontrolledDropdown>

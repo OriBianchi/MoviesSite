@@ -17,9 +17,12 @@ class MovieCards extends React.Component {
   }
 
   componentDidMount() {
-    // Fetch top-rated movie data from TMDb API
-    fetch('https://api.themoviedb.org/3/movie/top_rated?api_key=73a2526073ff49d6c8aa48eba5e42531')
-      .then(response => response.json())
+    const language = "es";
+
+    // Fetch top-rated movie data from TMDb API with the specified language
+    fetch(
+      `https://api.themoviedb.org/3/movie/top_rated?api_key=73a2526073ff49d6c8aa48eba5e42531&language=${language}`
+    ).then(response => response.json())
       .then(data => {
         this.setState({ movies: data.results.slice(0, 18) });
       })
