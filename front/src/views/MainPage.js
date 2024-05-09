@@ -21,9 +21,7 @@ class Landing extends React.Component {
   render() {
     return (
       <>
-        
         <main ref="main">
-          
           <Buscar />
         </main>
 

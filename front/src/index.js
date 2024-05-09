@@ -32,6 +32,7 @@ import Login from "views/Login.js";
 import MainPage from "views/MainPage.js";
 import Profile from "views/Profile";
 import Buscar from "views/Buscar.js";
+import MyLists from "views/MyLists";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -46,6 +47,7 @@ root.render(
       <Route path="/register" exact element={<Register />} />
       <Route path="/login" exact element={<Login />} />
       <Route path="/buscar" exact element={<Buscar />} />
+      <Route path="/my-lists" exact element={<MyLists />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   </BrowserRouter>
