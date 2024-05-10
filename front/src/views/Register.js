@@ -94,6 +94,7 @@ class Register extends React.Component {
                             className="mt-4"
                             color="primary"
                             type="button"
+                            href="/main-page"
                           >
                             Crear cuenta
                           </Button>

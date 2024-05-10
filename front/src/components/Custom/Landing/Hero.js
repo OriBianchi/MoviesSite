@@ -45,13 +45,13 @@ class Hero extends React.Component {
                 <Row className="align-items-center justify-content-center">
                   <Col className="text-center" lg="6">
                     <p className="lead text-white">
-                      Reseñas de películas y series de TV. ¡Regístrate y comienza a reseñar!
+                    ¡Conviértete en parte de nuestra comunidad de amantes del cine! <br></br> Regístrate ahora y descubre una nueva forma de disfrutar del cine. 
                     </p>
                     <div className="btn-wrapper mt-5">
                       <Button
                         className="btn-white btn-icon mb-3 mb-sm-0"
                         color="default"
-                        href="https://www.creative-tim.com/product/argon-design-system-react?ref=adsr-landing-page"
+                        href="/register"
                         size="lg"
                       >
                         <span className="btn-inner--text">Unite a la comunidad</span>

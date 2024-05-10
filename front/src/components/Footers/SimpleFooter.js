@@ -17,37 +17,23 @@ class SimpleFooter extends React.Component {
         <Container>
               <div className="d-flex justify-content-center">
                 <Button
-                  className="btn-icon-only rounded-circle"
-                  color="twitter"
-                  href="https://twitter.com/creativetim"
-                  id="tooltip475038074"
-                  target="_blank"
-                >
-                  <span className="btn-inner--icon">
-                    <i className="fa fa-twitter" />
-                  </span>
-                </Button>
-                <UncontrolledTooltip delay={0} target="tooltip475038074">
-                  Follow us
-                </UncontrolledTooltip>
-                <Button
                   className="btn-icon-only rounded-circle ml-1"
                   color="facebook"
-                  href="https://www.facebook.com/creativetim"
+                  href="https://www.linkedin.com/in/orianacbianchi/"
                   id="tooltip837440414"
                   target="_blank"
                 >
                   <span className="btn-inner--icon">
-                    <i className="fa fa-facebook-square" />
+                    <i className="fa fa-linkedin" />
                   </span>
                 </Button>
                 <UncontrolledTooltip delay={0} target="tooltip837440414">
-                  Like us
+                  Follow Ori
                 </UncontrolledTooltip>
                 <Button
                   className="btn-icon-only rounded-circle ml-1"
                   color="facebook"
-                  href=""
+                  href="https://www.linkedin.com/in/pazgiacchino/"
                   id="tooltip829810202"
                   target="_blank"
                 >
@@ -56,37 +42,30 @@ class SimpleFooter extends React.Component {
                   </span>
                 </Button>
                 <UncontrolledTooltip delay={0} target="tooltip829810202">
-                  Follow us
+                Follow Paz
                 </UncontrolledTooltip>
+                
               </div>
+              
+              
+              
           <hr />
           <Row className="align-items-center justify-content-md-between">
             <Col md="6" className="text-center text-md-left">
               <div className="copyright">
-                © {new Date().getFullYear()}{" "}
-                <a href="https://www.creative-tim.com?ref=adsr-footer" target="_blank">
-                  Creative Tim
-                </a>
-                .
+                © 2024 - 2024 by Paz y Ori.
+                
               </div>
             </Col>
             <Col md="6">
               <Nav className="nav-footer justify-content-center justify-content-md-end">
+                
                 <NavItem>
-                  <NavLink href="https://www.creative-tim.com?ref=adsr-footer" target="_blank">
-                    Creative Tim
-                  </NavLink>
+                  
+                    Special thanks to Sarasa
+                 
                 </NavItem>
-                <NavItem>
-                  <NavLink href="https://www.creative-tim.com/presentation?ref=adsr-footer" target="_blank">
-                    About Us
-                  </NavLink>
-                </NavItem>
-                <NavItem>
-                  <NavLink href="https://github.com/creativetimofficial/argon-design-system-react/blob/master/LICENSE.md" target="_blank">
-                    MIT License
-                  </NavLink>
-                </NavItem>
+               
               </Nav>
             </Col>
           </Row>
