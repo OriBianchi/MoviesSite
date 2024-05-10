@@ -13,7 +13,6 @@ import {
   NavItem,
   Nav,
   Container,
-  UncontrolledTooltip,
   Row,
   Col,
 } from "reactstrap";
@@ -45,6 +44,7 @@ class NavBar_LoggedIn extends React.Component {
     return (
       <>
         <header className="header-global">
+          <title>Cinefilia</title>
           <Navbar
             className="navbar-main navbar-transparent navbar-dark headroom"
             expand="lg"
@@ -118,7 +118,33 @@ class NavBar_LoggedIn extends React.Component {
                     </DropdownMenu>
                   </UncontrolledDropdown>
                 </Nav>
-                <Nav className="align-items-lg-center ml-lg-auto" navbar>
+                <Nav className="align-items-lg-center ml-auto" navbar>
+                  <NavItem className="d-lg-none">
+                    <Button
+                      className="btn-neutral btn-icon"
+                      color="default"
+                      href="/profile-page"
+                    >
+                      <span className="btn-inner--icon">
+                        <i className="fa fa-user mr-2" />
+                      </span>
+                      <span className="nav-link-inner--text ml-1">
+                        Mi cuenta
+                      </span>
+                    </Button>
+                    <Button
+                      className="btn-1 ml-1"
+                      color="danger"
+                      href="/"
+                    >
+                      <span className="btn-inner--icon">
+                        <i className="fa fa-sign-out mr-2" />
+                      </span>
+                      <span className="nav-link-inner--text ml-1">
+                        Cerrar sesión
+                      </span>
+                    </Button>
+                  </NavItem>
                   <NavItem className="d-none d-lg-block ml-lg-4">
                     <Button
                       className="btn-neutral btn-icon"
