@@ -10,11 +10,13 @@ import {
   Button,
   CardText,
   CardTitle,
-  
+  Dropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
 } from "reactstrap";
 import "./MovieCards.css";
 import ContentModal from "./ContentModal";
-
 
 const MovieCards = ({ searchQuery, listType }) => {
   const [movies, setMovies] = useState([]);
@@ -23,8 +25,20 @@ const MovieCards = ({ searchQuery, listType }) => {
   const [likedMovies, setLikedMovies] = useState([]);
   const [watchListedMovies, setWatchListedMovies] = useState([]);
   const [watchedMovies, setWatchedMovies] = useState([]);
-  const [modalMovie, setModalMovie] = useState(null); // Agrega estado para el modal
+  const [modalMovie, setModalMovie] = useState(null);
+  const [genres, setGenres] = useState([]);
+  const [selectedGenres, setSelectedGenres] = useState([]);
+  const [languages, setLanguages] = useState([]);
+  const [selectedLanguages, setSelectedLanguages] = useState([]);
+  const [genreDropdownOpen, setGenreDropdownOpen] = useState(false);
+  const [languageDropdownOpen, setLanguageDropdownOpen] = useState(false);
+  const [languageSearchTerm, setLanguageSearchTerm] = useState("");
+  const [ratingDropdownOpen, setRatingDropdownOpen] = useState(false);
+  const [selectedRating, setSelectedRating] = useState(null);
+  const [genreSearchTerm, setGenreSearchTerm] = useState("");
 
+ 
+ 
   useEffect(() => {
     // Retrieve liked movies from local storage
     const storedLikedMovies = JSON.parse(localStorage.getItem("likedMovies")) || [];
@@ -37,20 +51,43 @@ const MovieCards = ({ searchQuery, listType }) => {
     // Retrieve watched movies from local storage
     const storedWatchedMovies = JSON.parse(localStorage.getItem("watchedMovies")) || [];
     setWatchedMovies(storedWatchedMovies);
-
+    fetchGenres();
+    fetchLanguages();
     fetchMovies();
-  }, [page, searchQuery]);
+  }, [page, searchQuery, selectedGenres, selectedLanguages, selectedRating]);
+
+  const fetchGenres = () => {
+    fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=73a2526073ff49d6c8aa48eba5e42531&language=es`)
+      .then((response) => response.json())
+      .then((data) => {
+        setGenres(data.genres);
+      })
+      .catch((error) => console.log("Error fetching genres:", error));
+  };
+  
+
+  const fetchLanguages = () => {
+    fetch(`https://api.themoviedb.org/3/configuration/languages?api_key=73a2526073ff49d6c8aa48eba5e42531&language=es`)
+      .then((response) => response.json())
+      .then((data) => {
+        setLanguages(data);
+      })
+      .catch((error) => console.log("Error fetching languages:", error));
+  };
 
   const fetchMovies = () => {
     const query = searchQuery ? `&query=${searchQuery}` : "";
+    const genreQuery = selectedGenres.length > 0 ? `&with_genres=${selectedGenres.join(",")}` : "";
+    const languageQuery = selectedLanguages.length > 0 ? `&with_original_language=${selectedLanguages.join(",")}` : "";
+    const ratingQuery = selectedRating ? `&vote_average.gte=${selectedRating}` : "";
     const apiUrl = searchQuery
       ? `https://api.themoviedb.org/3/search/movie?api_key=73a2526073ff49d6c8aa48eba5e42531${query}&page=${page}&language=es`
-      : `https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=73a2526073ff49d6c8aa48eba5e42531&page=${page}&language=es`;
+      : `https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=73a2526073ff49d6c8aa48eba5e42531&page=${page}&language=es${genreQuery}${languageQuery}${ratingQuery}`;
 
     fetch(apiUrl)
       .then((response) => response.json())
       .then((data) => {
-        setMovies(data.results.slice(0, 18)); // Limit to the first 18 movies
+        setMovies(data.results.slice(0, 18));
         setTotalPages(data.total_pages);
       })
       .catch((error) => console.log("Error fetching data:", error));
@@ -59,7 +96,7 @@ const MovieCards = ({ searchQuery, listType }) => {
   const formatRating = (rating) => {
     return `⭐ ${parseFloat(rating).toFixed(1)}`;
   };
-
+  
   const toggleLike = (event, movieId) => {
     event.preventDefault();
     const updatedLikedMovies = likedMovies.includes(movieId)
@@ -89,7 +126,7 @@ const MovieCards = ({ searchQuery, listType }) => {
     localStorage.setItem("watchedMovies", JSON.stringify(updatedWatchedMovies));
     console.log("Updated Watched Movies:", updatedWatchedMovies);
   };
-/* Agregue estos const*/
+
   const openModal = (movie) => {
     setModalMovie(movie);
   };
@@ -98,7 +135,47 @@ const MovieCards = ({ searchQuery, listType }) => {
     setModalMovie(null);
   };
 
-  // Adjusted column settings based on screen size
+  const toggleGenreDropdown = () => {
+    setGenreDropdownOpen((prevState) => !prevState);
+  };
+
+  const toggleLanguageDropdown = () => {
+    setLanguageDropdownOpen((prevState) => !prevState);
+  };
+
+  const toggleRatingDropdown = () => {
+    setRatingDropdownOpen((prevState) => !prevState);
+  };
+
+  const handleGenreSelect = (genreId) => {
+    if (selectedGenres.includes(genreId)) {
+      setSelectedGenres(selectedGenres.filter((id) => id !== genreId));
+    } else {
+      setSelectedGenres([...selectedGenres, genreId]);
+    }
+  };
+
+  const handleLanguageSelect = (language) => {
+    if (selectedLanguages.includes(language)) {
+      setSelectedLanguages(selectedLanguages.filter((lang) => lang !== language));
+    } else {
+      setSelectedLanguages([...selectedLanguages, language]);
+    }
+  };
+
+  const handleLanguageSearchChange = (event) => {
+    setLanguageSearchTerm(event.target.value);
+  };
+  
+
+  const handleRatingSelect = (rating) => {
+    setSelectedRating(rating);
+  };
+
+  const filteredLanguages = languages.filter((language) =>
+    language.english_name.toLowerCase().includes(languageSearchTerm.toLowerCase())
+  );
+
   const columnSettings = {
     xs: 12,
     sm: 6,
@@ -107,7 +184,6 @@ const MovieCards = ({ searchQuery, listType }) => {
     xl: 2,
   };
 
-  // Filter movies based on listType
   let filteredMovies;
   switch (listType) {
     case "liked":
@@ -125,26 +201,106 @@ const MovieCards = ({ searchQuery, listType }) => {
 
   return (
     <Container fluid className="px-7">
-      <div className="text-center mb-3">
-        Mostrando {filteredMovies.length} películas de {totalPages * 20}
-      </div>
-      <Row xs="1" sm="2" md="3" lg="4" xl="5">
+      
+      <Row className="mb-4">
+        <Col>
+          <Dropdown isOpen={genreDropdownOpen} toggle={toggleGenreDropdown}>
+            <DropdownToggle caret>
+              {selectedGenres.length === 0 ? "Todos los Géneros" : `${selectedGenres.length} genres selected`}
+            </DropdownToggle>
+            <DropdownMenu>
+            <DropdownItem>
+                <input
+                type="text"
+                placeholder="Buscar género"
+                value={genreSearchTerm}
+                onChange={(e) => setGenreSearchTerm(e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+                 />
+                 </DropdownItem>
+
+              <DropdownItem onClick={() => setSelectedGenres([])}>Limpiar selcción</DropdownItem>
+              {genres
+              .filter((genre) =>
+              genre.name.toLowerCase().includes(genreSearchTerm.toLowerCase())
+            )
+            .map((genre) => (
+                <DropdownItem
+                  key={genre.id}
+                  onClick={() => handleGenreSelect(genre.id)}
+                  style={{ backgroundColor: selectedGenres.includes(genre.id) ? "#f0f0f0" : "transparent" }}
+                >
+                  {genre.name}
+                </DropdownItem>
+              ))}
+            </DropdownMenu>
+          </Dropdown>
+        </Col>
+        <Col>
+          <Dropdown isOpen={languageDropdownOpen} toggle={toggleLanguageDropdown}>
+            <DropdownToggle caret>
+              {selectedLanguages.length === 0 ? "Todos los idiomas" : `${selectedLanguages.length} languages selected`}
+            </DropdownToggle>
+            <DropdownMenu>
+              <DropdownItem>
+                <input
+                  type="text"
+                  placeholder="Buscar idioma"
+                  value={languageSearchTerm}
+                  onChange={handleLanguageSearchChange}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </DropdownItem>
+              <DropdownItem onClick={() => setSelectedLanguages([])}>Limpiar selcción</DropdownItem>
+              <DropdownItem divider />
+              {filteredLanguages.map((language) => (
+                <DropdownItem
+                  key={language.iso_639_1}
+                  onClick={() => handleLanguageSelect(language.iso_639_1)}
+                  style={{ backgroundColor: selectedLanguages.includes(language.iso_639_1) ? "#f0f0f0" : "transparent" }}
+                >
+                  {language.english_name}
+                </DropdownItem>
+              ))}
+            </DropdownMenu>
+          </Dropdown>
+        </Col>
+        <Col>
+          <Dropdown isOpen={ratingDropdownOpen} toggle={toggleRatingDropdown}>
+            <DropdownToggle caret>
+              {selectedRating ? `Rating: ${selectedRating} or more` : "Rating"}
+            </DropdownToggle>
+            <DropdownMenu>
+              <DropdownItem onClick={() => handleRatingSelect(null)}>Todo</DropdownItem>
+              {[4, 5, 6, 7, 8, 9].map((rating) => (
+                <DropdownItem
+                  key={rating}
+                  onClick={() => handleRatingSelect(rating)}
+                  style={{ backgroundColor: selectedRating === rating ? "#f0f0f0" : "transparent" }}
+                >
+                  {rating} o más
+                </DropdownItem>
+              ))}
+            </DropdownMenu>
+          </Dropdown>
+        </Col>
+      </Row>
+      <Row xs="2" sm="3" md="4" lg="5">
         {filteredMovies.map((movie, index) => (
           <Col key={index} className="mb-2 mb-md-4" {...columnSettings}>
             <Card className="shadow movie-card">
-              
-                <div className="position-relative">
-                  <CardImg
-                      onClick={() => openModal(movie)}/* Agregue el onclick aca*/
-                    top
-                    alt={movie.title}
-                    src={
-                      movie.poster_path
-                        ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
-                        : "https://upload.wikimedia.org/wikipedia/en/6/60/No_Picture.jpg"
-                    }
-                  />
-                  <Row className="justify-content-center mt-1">
+              <div className="position-relative">
+                <CardImg
+                  onClick={() => openModal(movie)}
+                  top
+                  alt={movie.title}
+                  src={
+                    movie.poster_path
+                      ? `https://image.tmdb.org/t/p/w300${movie.poster_path}`
+                      : "https://upload.wikimedia.org/wikipedia/en/6/60/No_Picture.jpg"
+                  }
+                />
+                <Row className="justify-content-center mt-1">
                     <Col xs="auto">
                       <div
                         className={`heart-icon ${
@@ -182,22 +338,16 @@ const MovieCards = ({ searchQuery, listType }) => {
                     </Col>
                   </Row>
                   <hr className="mt-1 mb-1" />{" "}
-                  {/* Adjusted margin top and bottom */}
+              </div>
+              <CardBody className="p-2 d-flex flex-column" onClick={() => openModal(movie)}>
+                <div className="flex-grow-1">
+                  <CardTitle className="text-center mb-1 mt-0 movie-title">{movie.title}</CardTitle>
+                  <CardText className="text-center mb-1 mt-0">
+                    ({new Date(movie.release_date).getFullYear()})
+                  </CardText>
+                  <CardText className="text-center mb-0 mt-0">{formatRating(movie.vote_average)}</CardText>
                 </div>
-                <CardBody className="p-2 d-flex flex-column" onClick={() => openModal(movie)}>{/* Agregue el onclick aca*/}
-                  <div className="flex-grow-1">
-                    <CardTitle className="text-center mb-1 mt-0 movie-title">
-                      {movie.title}
-                    </CardTitle>
-                    <CardText className="text-center mb-1 mt-0">
-                      ({new Date(movie.release_date).getFullYear()})
-                    </CardText>
-                    <CardText className="text-center mb-0 mt-0">
-                      {formatRating(movie.vote_average)}
-                    </CardText>
-                  </div>
-                </CardBody>
-              
+              </CardBody>
             </Card>
           </Col>
         ))}
@@ -206,14 +356,20 @@ const MovieCards = ({ searchQuery, listType }) => {
         <Col xs="auto">
           <Button
             color="primary"
-            onClick={() => setPage((prevPage) => prevPage - 1)}
+            onClick={() => {
+              setPage((prevPage) => prevPage - 1);
+              window.scrollTo(0, 0);
+            }}
             disabled={page === 1}
           >
             Previous
           </Button>
           <Button
             color="primary"
-            onClick={() => setPage((prevPage) => prevPage + 1)}
+            onClick={() => {
+              setPage((prevPage) => prevPage + 1);
+              window.scrollTo(0, 0);
+            }}
             disabled={page === totalPages}
           >
             Next

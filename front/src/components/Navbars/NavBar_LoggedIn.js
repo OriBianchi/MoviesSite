@@ -68,7 +68,7 @@ class NavBar_LoggedIn extends React.Component {
                 onExited={this.onExited}
               >
                 <div className="navbar-collapse-header">
-                <Row>
+                  <Row>
                     <Col className="collapse-brand" xs="6">
                       <Link to="/main-page">
                         <img
@@ -90,27 +90,11 @@ class NavBar_LoggedIn extends React.Component {
                     <DropdownToggle nav>
                       <i className="ni ni-collection d-lg-none mr-1" />
                       <span className="nav-link-inner--text">
-                      <Link to="/main-page">
-                        Buscador de películas
-                      </Link></span>
+                        <Link to="/main-page">
+                          Buscador de películas
+                        </Link>
+                      </span>
                     </DropdownToggle>
-                    {/* <DropdownMenu>
-                      <DropdownItem to="/main-page" tag={Link}>
-                        Ver Todas
-                      </DropdownItem>
-                      <DropdownItem to="/buscar" tag={Link}>
-                        Buscar
-                      </DropdownItem>
-                      <DropdownItem to="/por-genero" tag={Link}>
-                        Por géneros
-                      </DropdownItem>
-                      <DropdownItem to="/por-pais" tag={Link}>
-                        Por país
-                      </DropdownItem>
-                      <DropdownItem to="/top-10" tag={Link}>
-                        Top 10
-                      </DropdownItem>
-                    </DropdownMenu> */}
                   </UncontrolledDropdown>
                   <UncontrolledDropdown nav>
                     <DropdownToggle nav>

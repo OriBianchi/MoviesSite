@@ -1,169 +1,149 @@
-/*!
-
-=========================================================
-* Argon Design System React - v1.1.2
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-design-system-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-design-system-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-import React from "react";
-
-// reactstrap components
+import React, { useState, useEffect } from "react";
 import { Button, Card, Container, Row, Col } from "reactstrap";
-
-// core components
-import NavBar_LoggedOut from "components/Navbars/NavBar_LoggedOut.js";
+import NavBar_LoggedIn from "components/Navbars/NavBar_LoggedIn.js";
 import SimpleFooter from "components/Footers/SimpleFooter.js";
+import profileimg1 from "../assets/img/icons/profileicons/1.png";
+import profileimg2 from "../assets/img/icons/profileicons/2.png";
+import profileimg3 from "../assets/img/icons/profileicons/3.png";
+import profileimg4 from "../assets/img/icons/profileicons/4.png";
+import ChangePasswordModal from "../components/Custom/ChangePasswordModal.js";
 
-class Profile extends React.Component {
-  componentDidMount() {
-    document.documentElement.scrollTop = 0;
-    document.scrollingElement.scrollTop = 0;
-    this.refs.main.scrollTop = 0;
-  }
-  render() {
-    return (
-      <>
-        <NavBar_LoggedOut />
-        <main className="profile-page" ref="main">
-          <section className="section-profile-cover section-shaped my-0">
-            {/* Circles background */}
-            <div className="shape shape-style-1 shape-default alpha-4">
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-              <span />
-            </div>
-            {/* SVG separator */}
-            <div className="separator separator-bottom separator-skew">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                preserveAspectRatio="none"
-                version="1.1"
-                viewBox="0 0 2560 100"
-                x="0"
-                y="0"
-              >
-                <polygon
-                  className="fill-white"
-                  points="2560 0 2560 100 0 100"
-                />
-              </svg>
-            </div>
-          </section>
-          <section className="section">
-            <Container>
-              <Card className="card-profile shadow mt--300">
-                <div className="px-4">
-                  <Row className="justify-content-center">
-                    <Col className="order-lg-2" lg="3">
-                      <div className="card-profile-image">
-                        <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                          <img
-                            alt="..."
-                            className="rounded-circle"
-                            src={require("assets/img/theme/team-4-800x800.jpg")}
-                          />
-                        </a>
-                      </div>
-                    </Col>
-                    <Col
-                      className="order-lg-3 text-lg-right align-self-lg-center"
-                      lg="4"
+const Profile = () => {
+  const profileImages = [profileimg1, profileimg2, profileimg3, profileimg4];
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
+
+  useEffect(() => {
+    // Retrieve the selected image index from localStorage
+    const storedIndex = localStorage.getItem("selectedProfileImageIndex");
+    if (storedIndex !== null) {
+      setCurrentImageIndex(parseInt(storedIndex));
+    }
+  }, []);
+
+  const toggleChangePasswordModal = () => {
+    setIsChangePasswordModalOpen((prevState) => !prevState);
+  };
+
+  const handleClickProfileImage = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === profileImages.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  useEffect(() => {
+    // Save the selected image index to localStorage whenever it changes
+    localStorage.setItem("selectedProfileImageIndex", currentImageIndex);
+  }, [currentImageIndex]);
+
+  const handlePasswordChange = () => {
+    // Password change logic here
+    console.log("Password changed successfully!");
+    // Close the modal
+    toggleChangePasswordModal();
+  };
+
+  return (
+    <>
+      <NavBar_LoggedIn />
+      <main className="profile-page">
+        <section className="section-profile-cover section-shaped my-0">
+          <div className="shape shape-style-1 shape-default alpha-4">
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
+          <div className="separator separator-bottom separator-skew">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              preserveAspectRatio="none"
+              version="1.1"
+              viewBox="0 0 2560 100"
+              x="0"
+              y="0"
+            >
+              <polygon
+                className="fill-white"
+                points="2560 0 2560 100 0 100"
+              />
+            </svg>
+          </div>
+        </section>
+        <section className="section">
+          <Container>
+            <Card className="card-profile shadow mt--300">
+              <div className="px-4">
+                <Row className="justify-content-center">
+                  <Col className="order-lg-2" lg="3">
+                    <div className="card-profile-image">
+                      <a href="#pablo" onClick={handleClickProfileImage}>
+                        <img
+                          alt="..."
+                          className="rounded-circle"
+                          src={profileImages[currentImageIndex]}
+                        />
+                      </a>
+                    </div>
+                  </Col>
+                  <br />
+                  <br />
+                  <br />
+                  <br />
+                </Row>
+                <div className="text-center mt-5">
+                  <h3>Juanjo24</h3>
+                  <div className="h6 font-weight-300">
+                    <i className="ni location_pin mr-2" />
+                    Miembr@ de Cinefilia desde el 10 de mayo de 2024
+                  </div>
+                  <Col>
+                    <br />
+                    <Button
+                      className="float-center"
+                      color="warning"
+                      href="#pablo"
+                      onClick={toggleChangePasswordModal}
+                      size="sm"
                     >
-                      <div className="card-profile-actions py-4 mt-lg-0">
-                        <Button
-                          className="mr-4"
-                          color="info"
-                          href="#pablo"
-                          onClick={(e) => e.preventDefault()}
-                          size="sm"
-                        >
-                          Connect
-                        </Button>
-                        <Button
-                          className="float-right"
-                          color="default"
-                          href="#pablo"
-                          onClick={(e) => e.preventDefault()}
-                          size="sm"
-                        >
-                          Message
-                        </Button>
-                      </div>
-                    </Col>
+                      CAMBIAR MI CONTRASEÑA
+                    </Button>
+                  </Col>
+                  <Row className="justify-content-center">
                     <Col className="order-lg-1" lg="4">
                       <div className="card-profile-stats d-flex justify-content-center">
                         <div>
                           <span className="heading">22</span>
-                          <span className="description">Friends</span>
+                          <span className="description">Me gusta</span>
                         </div>
                         <div>
                           <span className="heading">10</span>
-                          <span className="description">Photos</span>
+                          <span className="description">Guardadas</span>
                         </div>
                         <div>
                           <span className="heading">89</span>
-                          <span className="description">Comments</span>
+                          <span className="description">Vistas</span>
                         </div>
                       </div>
                     </Col>
                   </Row>
-                  <div className="text-center mt-5">
-                    <h3>
-                      Jessica Jones{" "}
-                      <span className="font-weight-light">, 27</span>
-                    </h3>
-                    <div className="h6 font-weight-300">
-                      <i className="ni location_pin mr-2" />
-                      Bucharest, Romania
-                    </div>
-                    <div className="h6 mt-4">
-                      <i className="ni business_briefcase-24 mr-2" />
-                      Solution Manager - Creative Tim Officer
-                    </div>
-                    <div>
-                      <i className="ni education_hat mr-2" />
-                      University of Computer Science
-                    </div>
-                  </div>
-                  <div className="mt-5 py-5 border-top text-center">
-                    <Row className="justify-content-center">
-                      <Col lg="9">
-                        <p>
-                          An artist of considerable range, Ryan — the name taken
-                          by Melbourne-raised, Brooklyn-based Nick Murphy —
-                          writes, performs and records all of his own music,
-                          giving it a warm, intimate feel with a solid groove
-                          structure. An artist of considerable range.
-                        </p>
-                        <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                          Show more
-                        </a>
-                      </Col>
-                    </Row>
-                  </div>
                 </div>
-              </Card>
-            </Container>
-          </section>
-        </main>
-        <SimpleFooter />
-      </>
-    );
-  }
-}
+                <div className="mt-5 py-5 border-top text-center"></div>
+              </div>
+            </Card>
+          </Container>
+        </section>
+      </main>
+      <SimpleFooter />
+
+      {/* Change Password Modal */}
+      <ChangePasswordModal isOpen={isChangePasswordModalOpen} toggle={toggleChangePasswordModal} onPasswordChange={handlePasswordChange} />
+    </>
+  );
+};
 
 export default Profile;

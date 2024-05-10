@@ -3,11 +3,10 @@
   align-items: flex-start;
 }
 
-
 .movie-poster {
-  width: calc(100% - 20px); /* Adjust the width to be the full width of the modal minus the border and shadow */
+  width: 100%; /* Adjust the width to be the full width of the modal */
   height: 100%;
-  
+
 }
 
 .movie-info {
@@ -16,13 +15,63 @@
   max-width: 100%; /* Adjust the max-width to be the full width of the modal */
 }
 
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  border: none;
+  background: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #000;
+  opacity: 0.5;
+}
+
+.close-button:hover {
+  opacity: 1;
+}
+
 .modal-content {
   display: flex;
   align-items: center; /* Vertically align */
   justify-content: space-between; /* Horizontally align */
+  flex-wrap: wrap; /* Allow content to wrap to the next line if there's not enough space */
   
 }
 
+@media (max-width: 768px) { /* Apply these styles when the viewport is 768px wide or smaller */
+.movie-details {
+    flex-direction: column; /* Stack the poster and info vertically */
+  }
+
+.movie-poster {
+    width: 100%; /* Adjust the width to be the full width of the modal */
+  }
+
+.movie-info {
+    margin-top: 10px; /* Add some margin between the poster and info */
+  }
+}
+
+@media (max-width: 480px) { /* Apply these styles when the viewport is 480px wide or smaller (iPhone portrait) */
+ .movie-poster {
+    height: 150px; /* Adjust the height of the poster for iPhone portrait */
+  }
+
+ .movie-info {
+    font-size: 14px; /* Adjust the font size of the movie info for iPhone portrait */
+  }
+}
+
+@media (max-width: 320px) { /* Apply these styles when the viewport is 320px wide or smaller (iPhone landscape) */
+ .movie-poster {
+    height: 100px; /* Adjust the height of the poster for iPhone landscape */
+  }
+
+ .movie-info {
+    font-size: 12px; /* Adjust the font size of the movie info for iPhone landscape */
+  }
+}
 
 .movie-trailer {
   display: flex;
@@ -31,3 +80,34 @@
   margin-top: 10px;
 }
 
+@media (max-width: 768px) {
+  .movie-details {
+    flex-direction: column;
+  }
+
+  .poster {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .movie-info {
+    max-width: 100%;
+  }
+  .close-button:hover {
+    opacity: 1;
+  }
+  .close-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    border: none;
+    background: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #000;
+    opacity: 0.5;
+  }
+  .trailer-button {
+    width: 100%;
+  }
+}

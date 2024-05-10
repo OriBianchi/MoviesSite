@@ -25,7 +25,12 @@ a, a:hover { color: inherit; }
     font-size: 24px; /* Set the desired font size for the heart icon */
   }
   
+  .dropdown-menu {
+    max-height: 200px; /* Altura máxima del menú desplegable */
+    overflow-y: auto; /* Agregar un scrollbar vertical si es necesario */
+  }
   
+
   .heart-icon.liked {
     color: #ff5757;
   }
