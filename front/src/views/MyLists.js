@@ -156,6 +156,7 @@ class MyLists extends React.Component {
                       </p>
                     </Col>
                   </Row>
+
                 </div>
               </Container>
             </section>
@@ -165,7 +166,8 @@ class MyLists extends React.Component {
           <br></br>
           
           <section className="section">
-            <MovieCards />
+            {/* Pass listType prop based on the selected tab */}
+            <MovieCards listType={this.state.circledNavPills === 1 ? "liked" : this.state.circledNavPills === 2 ? "bookmarked" : "seen"} />
           </section>
         </main>
         <SimpleFooter />
