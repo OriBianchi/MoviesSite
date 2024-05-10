@@ -42,6 +42,9 @@ class NavBar_LoggedOut extends React.Component {
     return (
       <>
         <header className="header-global">
+        <title>
+     Cinefilia
+    </title>
           <Navbar
             className="navbar-main navbar-transparent navbar-dark headroom"
             expand="lg"
@@ -83,21 +86,8 @@ class NavBar_LoggedOut extends React.Component {
                   </Row>
                 </div>
                 <Nav className="align-items-lg-center ml-lg-auto" navbar>
-                  <NavItem className="ml-lg-4">
-                    <Button
-                      className="btn-neutral btn-icon d-md-none"
-                      color="default"
-                      href="/register"
-                    >
-                      <span className="nav-link-inner--text ml-1">Registro</span>
-                    </Button>
-                    <Button
-                      className="btn-1 d-md-none"
-                      color="primary"
-                      href="/login"
-                    >
-                      <span className="nav-link-inner--text ml-1">Iniciar sesión</span>
-                    </Button>
+                  
+                  <NavItem className="d-none d-lg-block ml-lg-4">
                     <Button
                       className="btn-neutral btn-icon d-none d-md-inline-block"
                       color="default"
@@ -117,6 +107,7 @@ class NavBar_LoggedOut extends React.Component {
               </UncontrolledCollapse>
             </Container>
           </Navbar>
+          
         </header>
       </>
     );

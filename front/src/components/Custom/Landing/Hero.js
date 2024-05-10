@@ -45,7 +45,7 @@ class Hero extends React.Component {
                 <Row className="align-items-center justify-content-center">
                   <Col className="text-center" lg="6">
                     <p className="lead text-white">
-                      Reseñas de películas y series de TV. ¡Regístrate y comienza a reseñar!
+                    ¡Conviértete en parte de nuestra comunidad de amantes del cine! <br></br> Regístrate ahora y descubre una nueva forma de disfrutar del cine. 
                     </p>
                     <div className="btn-wrapper mt-5">
                       <Button

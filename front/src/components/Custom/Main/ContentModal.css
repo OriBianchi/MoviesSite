@@ -1,0 +1,33 @@
+.movie-details {
+  display: flex;
+  align-items: flex-start;
+}
+
+
+.movie-poster {
+  width: calc(100% - 20px); /* Adjust the width to be the full width of the modal minus the border and shadow */
+  height: 100%;
+  
+}
+
+.movie-info {
+  flex-grow: 1;
+  /* Make sure there's no max-width restricting the growth */
+  max-width: 100%; /* Adjust the max-width to be the full width of the modal */
+}
+
+.modal-content {
+  display: flex;
+  align-items: center; /* Vertically align */
+  justify-content: space-between; /* Horizontally align */
+  
+}
+
+
+.movie-trailer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+

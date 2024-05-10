@@ -1,9 +1,12 @@
+
 import React from "react";
 import { Container, Row, Col } from "reactstrap";
 import NavBar_LoggedIn from "components/Navbars/NavBar_LoggedIn";
 import SimpleFooter from "components/Footers/SimpleFooter.js";
-import Search from "components/Custom/Main/Search.js";
-import MovieCards from "components/Custom/Main/MovieCards.js"; // Import the modified MovieCards component
+
+// index page sections
+import Buscar from "views/Buscar.js";
+import LikesDislikes from "components/Custom/Animations/LikesDislikes.js";
 
 class Landing extends React.Component {
   constructor(props) {
@@ -33,30 +36,11 @@ class Landing extends React.Component {
 
     return (
       <>
-        <NavBar_LoggedIn />
-        <main>
-          <Search />
-          <Container fluid className="my-5">
-            <Row
-              xs="1"
-              sm="2"
-              md="3"
-              lg="4"
-              xl="6"
-              className="justify-content-center row-eq-height"
-            >
-              {movies.map((movie, index) => (
-                <Col key={index} className="mb-4 mx-1">
-                  <MovieCards movie={movie} />
-                </Col>
-              ))}
-            </Row>
-          </Container>
-
-
-          
+        <main ref="main">
+          <Buscar />
         </main>
-        <SimpleFooter />
+
+       
       </>
     );
   }

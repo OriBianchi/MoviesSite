@@ -4,17 +4,16 @@ import Headroom from "headroom.js";
 import {
   Button,
   UncontrolledCollapse,
+  DropdownMenu,
+  DropdownItem,
+  DropdownToggle,
+  UncontrolledDropdown,
   NavbarBrand,
   Navbar,
   NavItem,
-  NavLink,
   Nav,
   Container,
   UncontrolledTooltip,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
   Row,
   Col,
 } from "reactstrap";
@@ -25,10 +24,9 @@ class NavBar_LoggedIn extends React.Component {
     let headroom = new Headroom(document.getElementById("navbar-main"));
     headroom.init();
   }
-  
+
   state = {
     collapseClasses: "",
-    collapseOpen: false,
   };
 
   onExiting = () => {
@@ -53,7 +51,7 @@ class NavBar_LoggedIn extends React.Component {
             id="navbar-main"
           >
             <Container>
-              <NavbarBrand className="mr-lg-5" to="/" tag={Link}>
+              <NavbarBrand className="mr-lg-5" to="/main-page" tag={Link}>
                 <img
                   alt="..."
                   src={require("assets/img/brand/cinefilia_wt.png")}
@@ -72,7 +70,7 @@ class NavBar_LoggedIn extends React.Component {
                 <div className="navbar-collapse-header">
                 <Row>
                     <Col className="collapse-brand" xs="6">
-                      <Link to="/">
+                      <Link to="/main-page">
                         <img
                           alt="..."
                           src={require("assets/img/brand/cinefilia_blk.png")}
@@ -87,13 +85,19 @@ class NavBar_LoggedIn extends React.Component {
                     </Col>
                   </Row>
                 </div>
-                <Nav className="align-items-lg-center navbar-nav-hover" navbar>
+                <Nav className="navbar-nav-hover align-items-lg-center" navbar>
                   <UncontrolledDropdown nav>
                     <DropdownToggle nav>
                       <i className="ni ni-collection d-lg-none mr-1" />
-                      <span className="nav-link-inner--text">Películas</span>
+                      <span className="nav-link-inner--text">
+                      <Link to="/main-page">
+                        Buscador de películas
+                      </Link></span>
                     </DropdownToggle>
-                    <DropdownMenu className="dropdown-menu-right">
+                    {/* <DropdownMenu>
+                      <DropdownItem to="/main-page" tag={Link}>
+                        Ver Todas
+                      </DropdownItem>
                       <DropdownItem to="/buscar" tag={Link}>
                         Buscar
                       </DropdownItem>
@@ -106,72 +110,31 @@ class NavBar_LoggedIn extends React.Component {
                       <DropdownItem to="/top-10" tag={Link}>
                         Top 10
                       </DropdownItem>
-                    </DropdownMenu>
+                    </DropdownMenu> */}
                   </UncontrolledDropdown>
                   <UncontrolledDropdown nav>
                     <DropdownToggle nav>
                       <i className="ni ni-collection d-lg-none mr-1" />
-                      <span className="nav-link-inner--text">Series</span>
+                      <span className="nav-link-inner--text">
+                        <Link to="/my-lists">
+                          Listas
+                        </Link>
+                      </span>
                     </DropdownToggle>
-                    <DropdownMenu className="dropdown-menu-right">
-                      <DropdownItem to="/buscar" tag={Link}>
-                        Buscar
+                    <DropdownMenu>
+                      <DropdownItem to="/my-lists?tab=favoritas" tag={Link}>
+                        ❤️ Favoritas
                       </DropdownItem>
-                      <DropdownItem to="/por-genero" tag={Link}>
-                        Por géneros
+                      <DropdownItem to="/my-lists?tab=guardadas" tag={Link}>
+                        🔖 Guardadas
                       </DropdownItem>
-                      <DropdownItem to="/por-pais" tag={Link}>
-                        Por país
-                      </DropdownItem>
-                      <DropdownItem to="/top-10" tag={Link}>
-                        Top 10
-                      </DropdownItem>
-                    </DropdownMenu>
-                  </UncontrolledDropdown>
-                  <UncontrolledDropdown nav>
-                    <DropdownToggle nav>
-                      <i className="ni ni-collection d-lg-none mr-1" />
-                      <span className="nav-link-inner--text">Tus listas</span>
-                    </DropdownToggle>
-                    <DropdownMenu className="dropdown-menu-right">
-                      <DropdownItem to="/tus-listas" tag={Link}>
-                        Favoritas
-                      </DropdownItem>
-                      <DropdownItem to="/tus-favoritas" tag={Link}>
-                        Películas
+                      <DropdownItem to="/my-lists?tab=vistas" tag={Link}>
+                        👁‍🗨 Vistas
                       </DropdownItem>
                     </DropdownMenu>
                   </UncontrolledDropdown>
                 </Nav>
                 <Nav className="align-items-lg-center ml-lg-auto" navbar>
-                  <NavItem className="d-lg-none">
-                    <Button
-                      className="btn-neutral btn-icon"
-                      color="default"
-                      href="/profile-page"
-                    >
-                      <span className="btn-inner--icon">
-                        <i className="fa fa-user mr-2" />
-                      </span>
-                      <span className="nav-link-inner--text ml-1">
-                        Mi cuenta
-                      </span>
-                    </Button>
-                  </NavItem>
-                  <NavItem className="d-lg-none">
-                    <Button
-                      className="btn-1 ml-1"
-                      color="danger"
-                      href="/"
-                    >
-                      <span className="btn-inner--icon">
-                        <i className="fa fa-sign-out mr-2" />
-                      </span>
-                      <span className="nav-link-inner--text ml-1">
-                        Cerrar sesión
-                      </span>
-                    </Button>
-                  </NavItem>
                   <NavItem className="d-none d-lg-block ml-lg-4">
                     <Button
                       className="btn-neutral btn-icon"
