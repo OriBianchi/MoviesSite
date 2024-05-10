@@ -10,8 +10,11 @@ import {
   Button,
   CardText,
   CardTitle,
+  
 } from "reactstrap";
 import "./MovieCards.css";
+import ContentModal from "./ContentModal";
+
 
 const MovieCards = ({ searchQuery }) => {
   const [movies, setMovies] = useState([]);
@@ -20,6 +23,7 @@ const MovieCards = ({ searchQuery }) => {
   const [likedMovies, setLikedMovies] = useState([]);
   const [watchListedMovies, setWatchListedMovies] = useState([]);
   const [watchedMovies, setWatchedMovies] = useState([]);
+  const [modalMovie, setModalMovie] = useState(null); // Agrega estado para el modal
 
   useEffect(() => {
     fetchMovies();
@@ -71,6 +75,14 @@ const fetchMovies = () => {
       setWatchedMovies([...watchedMovies, movieId]);
     }
   };
+/* Agregue estos const*/
+  const openModal = (movie) => {
+    setModalMovie(movie);
+  };
+
+  const closeModal = () => {
+    setModalMovie(null);
+  };
 
   return (
     <Container fluid className="px-7">
@@ -78,9 +90,10 @@ const fetchMovies = () => {
         {movies.map((movie, index) => (
           <Col key={index} className="mb-2 mb-md-4">
             <Card className="shadow movie-card">
-              <Link to={`/movie/${movie.id}`}>
+              
                 <div className="position-relative">
                   <CardImg
+                      onClick={() => openModal(movie)}/* Agregue el onclick aca*/
                     top
                     alt={movie.title}
                     src={movie.poster_path? `https://image.tmdb.org/t/p/w300${movie.poster_path}` : 'https://upload.wikimedia.org/wikipedia/en/6/60/No_Picture.jpg'}
@@ -118,7 +131,7 @@ const fetchMovies = () => {
                   </Row>
                   <hr className="mt-1 mb-1" /> {/* Adjusted margin top and bottom */}
                 </div>
-                <CardBody className="p-2 d-flex flex-column">
+                <CardBody className="p-2 d-flex flex-column" onClick={() => openModal(movie)}>{/* Agregue el onclick aca*/}
                   <div className="flex-grow-1">
                     <CardTitle className="text-center mb-1 mt-0 movie-title">
                       {movie.title}
@@ -131,7 +144,7 @@ const fetchMovies = () => {
                     </CardText>
                   </div>
                 </CardBody>
-              </Link>
+              
             </Card>
           </Col>
         ))}
@@ -154,6 +167,7 @@ const fetchMovies = () => {
           </Button>
         </Col>
       </Row>
+      <ContentModal modalMovie={modalMovie} toggleModal={closeModal} />
     </Container>
   );
 };
