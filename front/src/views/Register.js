@@ -31,54 +31,32 @@ const Register = () => {
   const handleUsernameChange = (e) => {
     const { value } = e.target;
     setUsername(value);
-    if (!value) {
-      setUsernameError("Por favor, ingrese un nombre de usuario.");
-    } else {
-      setUsernameError("");
-    }
+    setUsernameError("");
   };
 
   const handleEmailChange = (e) => {
     const { value } = e.target;
     setEmail(value);
-    if (!validateEmail(value)) {
-      setEmailError("Por favor, ingrese un correo electrónico válido.");
-    } else {
-      setEmailError("");
-    }
+    setEmailError("");
   };
 
   const handlePasswordChange = (e) => {
     const { value } = e.target;
     setPassword(value);
-    if (!value) {
-      setPasswordError("Por favor, ingrese una contraseña.");
-    } else if (!isStrongPassword(value)) {
-      setPasswordError("La contraseña debe contener al menos 8 caracteres, incluyendo letras, números y los siguientes símbolos: 0-9, !@#$%^&*_+=");
-    } else {
-      setPasswordError("");
-    }
-    // Check if passwords match
-    if (value !== confirmPassword) {
-      setConfirmPasswordError("Las contraseñas no coinciden.");
-    } else {
-      setConfirmPasswordError("");
-    }
+    setPasswordError("");
+    setConfirmPasswordError("");
   };
 
   const handleConfirmPasswordChange = (e) => {
     const { value } = e.target;
     setConfirmPassword(value);
-    // Check if passwords match
-    if (value !== password) {
-      setConfirmPasswordError("Las contraseñas no coinciden.");
-    } else {
-      setConfirmPasswordError("");
-    }
+    setConfirmPasswordError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate input fields
     if (!username || !validateEmail(email) || !password || password !== confirmPassword) {
       if (!username) {
         setUsernameError("Por favor, ingrese un nombre de usuario.");
@@ -94,38 +72,87 @@ const Register = () => {
       }
       return;
     }
+
     // Start loading
     setIsLoading(true);
-    // Simulate registration success
-    setTimeout(() => {
-      setRegistrationSuccess(true);
-      setIsLoading(false);
-      // Reset form fields
-      setUsername("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
-      // Hide confirmation message after 3 seconds
-      setTimeout(() => {
-        setRegistrationSuccess(false);
-        // Redirect to login page after 2 seconds
+
+    try {
+      // Check if username or email already exists
+      const checkResponse = await fetch("http://localhost:5000/api/users/check", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, email }),
+      });
+
+      const checkData = await checkResponse.json();
+
+      if (!checkResponse.ok) {
+        if (checkData.errors) {
+          if (checkData.errors.email) {
+            setEmailError(checkData.errors.email);
+          }
+          if (checkData.errors.username) {
+            setUsernameError(checkData.errors.username);
+          }
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      // Proceed with registration if no existing user found
+      const response = await fetch("http://localhost:5000/api/users/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      const responseData = await response.json();
+
+      if (response.ok) {
+        setRegistrationSuccess(true);
+        setIsLoading(false);
+        // Reset form fields
+        setUsername("");
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+        // Hide confirmation message after 3 seconds
         setTimeout(() => {
-          window.location.href = "/login";
-        }, 0);
-      }, 1000);
-    }, 2000);
+          setRegistrationSuccess(false);
+          // Redirect to login page after 2 seconds
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 0);
+        }, 1000);
+      } else {
+        // Handle specific error messages from the backend
+        if (responseData.errors) {
+          responseData.errors.forEach((error) => {
+            if (error.param === "username") {
+              setUsernameError(error.msg);
+            } else if (error.param === "email") {
+              setEmailError(error.msg);
+            } else if (error.param === "password") {
+              setPasswordError(error.msg);
+            }
+          });
+        }
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+      setIsLoading(false);
+    }
   };
 
   const validateEmail = (email) => {
     // Email regex pattern
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailPattern.test(email);
-  };
-
-  const isStrongPassword = (password) => {
-    // Password regex pattern: at least 8 characters, including letters, numbers, and the specified symbols
-    const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*_+=])[A-Za-z\d!@#$%^&*_+=]{8,}$/;
-    return passwordPattern.test(password);
   };
 
   return (

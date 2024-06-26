@@ -46,7 +46,7 @@ class Landing extends React.Component {
                               className="badge-circle mr-3"
                               color="success"
                             >
-                              <i className="ni ni-settings-gear-65" />
+                              <i className="ni " />
                             </Badge>
                           </div>
                           <div>
@@ -63,7 +63,7 @@ class Landing extends React.Component {
                               className="badge-circle mr-3"
                               color="success"
                             >
-                              <i className="ni ni-html5" />
+                              <i className="ni bold-right" />
                             </Badge>
                           </div>
                           <div>
@@ -80,7 +80,7 @@ class Landing extends React.Component {
                               className="badge-circle mr-3"
                               color="success"
                             >
-                              <i className="ni ni-html5" />
+                              <i className="ni" />
                             </Badge>
                           </div>
                           <div>
