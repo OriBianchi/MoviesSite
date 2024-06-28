@@ -24,6 +24,7 @@ const Login = () => {
   const [passwordError, setPasswordError] = useState("");
   const [isLostPasswordModalOpen, setIsLostPasswordModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
 
   const toggleLostPasswordModal = () => {
     setIsLostPasswordModalOpen(!isLostPasswordModalOpen);
@@ -49,7 +50,7 @@ const Login = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateEmail(email) || !password) {
       if (!validateEmail(email)) {
@@ -60,21 +61,42 @@ const Login = () => {
       }
       return;
     }
-    // Start loading
+
     setIsLoading(true);
-    // Simulate login success
-    setTimeout(() => {
-      // Reset loading state
+    setLoginError("");
+
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Save token to local storage
+        localStorage.setItem('token', data.token);
+
+        // Optionally, redirect to the main page after successful login
+        setTimeout(() => {
+          window.location.href = "/main-page";
+        }, 1000);
+      } else {
+        setLoginError(data.message || "Error al iniciar sesión. Por favor, inténtelo de nuevo.");
+      }
+
       setIsLoading(false);
-      // Optionally, redirect to main page after one second
-      setTimeout(() => {
-        window.location.href = "/main-page";
-      }, 1000);
-    }, 1000);
+    } catch (error) {
+      console.error("Error during login:", error);
+      setLoginError("Error al iniciar sesión. Por favor, inténtelo de nuevo.");
+      setIsLoading(false);
+    }
   };
 
   const validateEmail = (email) => {
-    // Email regex pattern
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailPattern.test(email);
   };
@@ -147,7 +169,11 @@ const Login = () => {
                           </a>
                         </small>
                       </div>
-
+                      {loginError && (
+                        <div className="text-center text-danger mb-3">
+                          {loginError}
+                        </div>
+                      )}
                       <div className="text-center">
                         <Button
                           className="my-4"

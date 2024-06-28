@@ -2,6 +2,29 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+// JWT Secret Key (replace with your actual secret key)
+const jwtSecret = 'your_jwt_secret_key';
+
+// Middleware to verify token
+const auth = (req, res, next) => {
+  const token = req.header('x-auth-token');
+  console.log('Received token:', token); // Log the token received by the server
+  if (!token) {
+    return res.status(401).json({ message: 'No token, authorization denied.' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, jwtSecret);
+    req.user = decoded;
+    next();
+  } catch (err) {
+    console.error('Error verifying token:', err);
+    res.status(401).json({ message: 'Token is not valid.' });
+  }
+};
+
 
 // Register a new user
 router.post('/register', async (req, res) => {
@@ -68,6 +91,19 @@ router.get('/', async (req, res) => {
   try {
     const users = await User.find();
     res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Get logged in user
+router.get('/user', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+    res.json(user);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

@@ -4,8 +4,8 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// JWT Secret Key
-const jwtSecret = 'your_jwt_secret_key'; // Replace with a strong secret key
+// JWT Secret Key (replace with a strong secret key)
+const jwtSecret = process.env.JWT_SECRET || 'default_jwt_secret_key';
 
 // Register a new user
 router.post('/register', async (req, res) => {
@@ -16,25 +16,33 @@ router.post('/register', async (req, res) => {
   }
 
   try {
+    // Check if email already exists
     const existingEmailUser = await User.findOne({ email });
     if (existingEmailUser) {
       return res.status(400).json({ message: 'Email already exists.' });
     }
 
+    // Check if username already exists
     const existingUsernameUser = await User.findOne({ username });
     if (existingUsernameUser) {
       return res.status(400).json({ message: 'Username already exists.' });
     }
 
+    // Hash the password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // Create a new user instance
     const newUser = new User({ username, email, password: hashedPassword });
+    // Save the new user
     const savedUser = await newUser.save();
 
+    // Respond with the saved user data
     res.status(201).json(savedUser);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    // Handle server errors
+    console.error('Error registering user:', err);
+    res.status(500).json({ message: 'Server error while registering user.' });
   }
 });
 
@@ -47,21 +55,27 @@ router.post('/login', async (req, res) => {
   }
 
   try {
+    // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials.' });
     }
 
+    // Compare passwords
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials.' });
     }
 
+    // Generate JWT token
     const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '1h' });
 
+    // Respond with token and user data
     res.json({ token, user: { id: user._id, username: user.username, email: user.email } });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    // Handle server errors
+    console.error('Error logging in user:', err);
+    res.status(500).json({ message: 'Server error while logging in user.' });
   }
 });
 
@@ -73,10 +87,14 @@ const auth = (req, res, next) => {
   }
 
   try {
+    // Verify JWT token
     const decoded = jwt.verify(token, jwtSecret);
+    // Set decoded user information to req.user
     req.user = decoded;
-    next();
+    next(); // Proceed to the next middleware or route handler
   } catch (err) {
+    // Handle token verification errors
+    console.error('Error verifying token:', err);
     res.status(401).json({ message: 'Token is not valid.' });
   }
 };
@@ -84,10 +102,17 @@ const auth = (req, res, next) => {
 // Get logged in user
 router.get('/user', auth, async (req, res) => {
   try {
+    // Find user by ID and exclude password field
     const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+    // Respond with user data
     res.json(user);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    // Handle server errors
+    console.error('Error fetching user data:', err);
+    res.status(500).json({ message: 'Server error while fetching user data.' });
   }
 });
 

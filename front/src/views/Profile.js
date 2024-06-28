@@ -13,6 +13,11 @@ const Profile = () => {
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
+  const [userData, setUserData] = useState({});
+  const [likedCount, setLikedCount] = useState(0);
+  const [savedCount, setSavedCount] = useState(0);
+  const [seenCount, setSeenCount] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Retrieve the selected image index from localStorage
@@ -20,6 +25,39 @@ const Profile = () => {
     if (storedIndex !== null) {
       setCurrentImageIndex(parseInt(storedIndex));
     }
+  }, []);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        return;
+      }
+
+      try {
+        const response = await fetch("http://localhost:5000/api/auth/user", {
+          headers: {
+            "x-auth-token": token,
+          },
+        });
+        const data = await response.json();
+        if (response.ok) {
+          setUserData(data);
+          // Update counts
+          setLikedCount(data.likedMovies.length);
+          setSavedCount(data.savedMovies.length);
+          setSeenCount(data.seenMovies.length);
+        } else {
+          console.error("Failed to fetch user data", data.message);
+        }
+      } catch (error) {
+        console.error("Error fetching user data", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
   }, []);
 
   const toggleChangePasswordModal = () => {
@@ -43,6 +81,10 @@ const Profile = () => {
     // Close the modal
     toggleChangePasswordModal();
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <>
@@ -96,10 +138,14 @@ const Profile = () => {
                   <br />
                 </Row>
                 <div className="text-center mt-5">
-                  <h3>Juanjo24</h3>
+                  <h3>{userData.username}</h3>
                   <div className="h6 font-weight-300">
                     <i className="ni location_pin mr-2" />
-                    Miembr@ de Cinefilia desde el 10 de mayo de 2024
+                    Miembr@ de Cinefilia desde {new Date(userData.creationDate).toLocaleDateString()}
+                  </div>
+                  <div className="h6 font-weight-300">
+                    <i className="ni email-83 mr-2" />
+                    {userData.email}
                   </div>
                   <Col>
                     <br />
@@ -117,15 +163,15 @@ const Profile = () => {
                     <Col className="order-lg-1" lg="4">
                       <div className="card-profile-stats d-flex justify-content-center">
                         <div>
-                          <span className="heading">22</span>
+                          <span className="heading">{likedCount}</span>
                           <span className="description">Me gusta</span>
                         </div>
                         <div>
-                          <span className="heading">10</span>
+                          <span className="heading">{savedCount}</span>
                           <span className="description">Guardadas</span>
                         </div>
                         <div>
-                          <span className="heading">89</span>
+                          <span className="heading">{seenCount}</span>
                           <span className="description">Vistas</span>
                         </div>
                       </div>

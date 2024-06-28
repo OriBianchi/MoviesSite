@@ -47,6 +47,7 @@
     "not op_mini all"
   ],
   "dependencies": {
+    "ajv": "^8.16.0",
     "axios": "^1.6.8",
     "bootstrap": "4.6.2",
     "classnames": "2.3.2",
