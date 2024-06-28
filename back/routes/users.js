@@ -29,7 +29,7 @@ const auth = (req, res, next) => {
 router.post('/user/add/:list', auth, async (req, res) => {
   const { list } = req.params;
   const { movieId } = req.body;
-
+  console.log(req.body);
   try {
     // Check if movieId is provided
     if (!movieId) {
@@ -42,15 +42,17 @@ router.post('/user/add/:list', auth, async (req, res) => {
       return res.status(404).json({ message: 'User not found.' });
     }
 
-    // Update the specified list
+    // Update the specified list if the movieId is not already included
     if (!user[list].includes(movieId)) {
       user[list].push(movieId);
       await user.save();
     }
 
+    // Return the updated user object with the modified list
     res.json(user);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Error adding movie to list:', err);
+    res.status(500).json({ message: 'Server Error.' });
   }
 });
 
@@ -59,7 +61,7 @@ router.get('/user/get/:list', auth, async (req, res) => {
   const { list } = req.params;
 
   try {
-    // Find the user by ID and update the respective list
+    // Find the user by ID and fetch the respective list
     const user = await User.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ message: 'User not found.' });
@@ -67,10 +69,9 @@ router.get('/user/get/:list', auth, async (req, res) => {
 
     // Return the specified list
     res.json(user[list]);
-
-    res.json(user);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Error fetching user list:', err);
+    res.status(500).json({ message: 'Server Error.' });
   }
 });
 
@@ -91,13 +92,15 @@ router.post('/user/delete/:list', auth, async (req, res) => {
       return res.status(404).json({ message: 'User not found.' });
     }
 
-    // Update the specified list
+    // Remove the movieId from the specified list
     user[list] = user[list].filter(id => id.toString() !== movieId);
     await user.save();
 
+    // Return the updated user object with the modified list
     res.json(user);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Error deleting movie from list:', err);
+    res.status(500).json({ message: 'Server Error.' });
   }
 });
 
@@ -132,7 +135,8 @@ router.post('/register', async (req, res) => {
     const savedUser = await newUser.save();
     res.status(201).json(savedUser);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Error registering user:', err);
+    res.status(500).json({ message: 'Server Error.' });
   }
 });
 
@@ -157,7 +161,8 @@ router.post('/check', async (req, res) => {
 
     res.status(200).json({ message: 'User does not exist.' });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Error checking user:', err);
+    res.status(500).json({ message: 'Server Error.' });
   }
 });
 
@@ -167,7 +172,8 @@ router.get('/', async (req, res) => {
     const users = await User.find();
     res.json(users);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Error fetching users:', err);
+    res.status(500).json({ message: 'Server Error.' });
   }
 });
 
@@ -180,7 +186,8 @@ router.get('/user', auth, async (req, res) => {
     }
     res.json(user);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Error fetching logged in user:', err);
+    res.status(500).json({ message: 'Server Error.' });
   }
 });
 

@@ -17,16 +17,13 @@ const UserSchema = new Schema({
     required: true
   },
   likedMovies: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Movie'
+    type: String,
   }],
   seenMovies: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Movie'
+    type: String,
   }],
   savedMovies: [{
-    type: Schema.Types.ObjectId,
-    ref: 'Movie'
+    type: String,
   }],
   creationDate: {
     type: Date,
