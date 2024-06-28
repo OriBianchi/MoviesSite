@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 // JWT Secret Key (replace with your actual secret key)
-const jwtSecret = 'your_jwt_secret_key';
+const jwtSecret = process.env.JWT_SECRET || '7751eabcfcf473627bcdbee7ca874bd51f4227376ae918e29f78e6cff9f55b9e';
 
 // Middleware to verify token
 const auth = (req, res, next) => {
@@ -25,6 +25,81 @@ const auth = (req, res, next) => {
   }
 };
 
+// Add movie ID to user's list
+router.post('/user/add/:list', auth, async (req, res) => {
+  const { list } = req.params;
+  const { movieId } = req.body;
+
+  try {
+    // Check if movieId is provided
+    if (!movieId) {
+      return res.status(400).json({ message: 'Movie ID is required.' });
+    }
+
+    // Find the user by ID and update the respective list
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    // Update the specified list
+    if (!user[list].includes(movieId)) {
+      user[list].push(movieId);
+      await user.save();
+    }
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Get movies from user's list
+router.get('/user/get/:list', auth, async (req, res) => {
+  const { list } = req.params;
+
+  try {
+    // Find the user by ID and update the respective list
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    // Return the specified list
+    res.json(user[list]);
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Remove movie ID from user's list
+router.post('/user/delete/:list', auth, async (req, res) => {
+  const { list } = req.params;
+  const { movieId } = req.body;
+
+  try {
+    // Check if movieId is provided
+    if (!movieId) {
+      return res.status(400).json({ message: 'Movie ID is required.' });
+    }
+
+    // Find the user by ID and update the respective list
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    // Update the specified list
+    user[list] = user[list].filter(id => id.toString() !== movieId);
+    await user.save();
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 // Register a new user
 router.post('/register', async (req, res) => {

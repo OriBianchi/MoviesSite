@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 // JWT Secret Key (replace with a strong secret key)
-const jwtSecret = process.env.JWT_SECRET || 'default_jwt_secret_key';
+const jwtSecret = process.env.JWT_SECRET || '7751eabcfcf473627bcdbee7ca874bd51f4227376ae918e29f78e6cff9f55b9e';
 
 // Register a new user
 router.post('/register', async (req, res) => {

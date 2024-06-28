@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import {
   Card,
   CardImg,
@@ -37,37 +36,29 @@ const MovieCards = ({ searchQuery, listType }) => {
   const [selectedRating, setSelectedRating] = useState(null);
   const [genreSearchTerm, setGenreSearchTerm] = useState("");
 
- 
- 
   useEffect(() => {
-    // Retrieve liked movies from local storage
-    const storedLikedMovies = JSON.parse(localStorage.getItem("likedMovies")) || [];
-    setLikedMovies(storedLikedMovies);
-
-    // Retrieve watchlisted movies from local storage
-    const storedWatchListedMovies = JSON.parse(localStorage.getItem("watchListedMovies")) || [];
-    setWatchListedMovies(storedWatchListedMovies);
-
-    // Retrieve watched movies from local storage
-    const storedWatchedMovies = JSON.parse(localStorage.getItem("watchedMovies")) || [];
-    setWatchedMovies(storedWatchedMovies);
     fetchGenres();
     fetchLanguages();
     fetchMovies();
+    // Fetch user's liked, watchlisted, and watched movies from backend on component mount
+    fetchUserMovieLists();
   }, [page, searchQuery, selectedGenres, selectedLanguages, selectedRating]);
 
   const fetchGenres = () => {
-    fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=73a2526073ff49d6c8aa48eba5e42531&language=es`)
+    fetch(
+      `https://api.themoviedb.org/3/genre/movie/list?api_key=73a2526073ff49d6c8aa48eba5e42531&language=es`
+    )
       .then((response) => response.json())
       .then((data) => {
         setGenres(data.genres);
       })
       .catch((error) => console.log("Error fetching genres:", error));
   };
-  
 
   const fetchLanguages = () => {
-    fetch(`https://api.themoviedb.org/3/configuration/languages?api_key=73a2526073ff49d6c8aa48eba5e42531&language=es`)
+    fetch(
+      `https://api.themoviedb.org/3/configuration/languages?api_key=73a2526073ff49d6c8aa48eba5e42531&language=es`
+    )
       .then((response) => response.json())
       .then((data) => {
         setLanguages(data);
@@ -77,8 +68,12 @@ const MovieCards = ({ searchQuery, listType }) => {
 
   const fetchMovies = () => {
     const query = searchQuery ? `&query=${searchQuery}` : "";
-    const genreQuery = selectedGenres.length > 0 ? `&with_genres=${selectedGenres.join(",")}` : "";
-    const languageQuery = selectedLanguages.length > 0 ? `&with_original_language=${selectedLanguages.join(",")}` : "";
+    const genreQuery =
+      selectedGenres.length > 0 ? `&with_genres=${selectedGenres.join(",")}` : "";
+    const languageQuery =
+      selectedLanguages.length > 0
+        ? `&with_original_language=${selectedLanguages.join(",")}`
+        : "";
     const ratingQuery = selectedRating ? `&vote_average.gte=${selectedRating}` : "";
     const apiUrl = searchQuery
       ? `https://api.themoviedb.org/3/search/movie?api_key=73a2526073ff49d6c8aa48eba5e42531${query}&page=${page}&language=es`
@@ -93,18 +88,55 @@ const MovieCards = ({ searchQuery, listType }) => {
       .catch((error) => console.log("Error fetching data:", error));
   };
 
+  const fetchUserMovieLists = () => {
+    // Fetch user's liked movies
+    fetch("http://localhost:3000/user/likedMovies", {
+      headers: {
+        "x-auth-token": localStorage.getItem("token"),
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setLikedMovies(data.likedMovies.map((movie) => movie._id));
+      })
+      .catch((error) => console.log("Error fetching liked movies:", error));
+
+    // Fetch user's watchlisted movies
+    fetch("http://localhost:3000/user/savedMovies", {
+      headers: {
+        "x-auth-token": localStorage.getItem("token"),
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setWatchListedMovies(data.savedMovies.map((movie) => movie._id));
+      })
+      .catch((error) => console.log("Error fetching watchlisted movies:", error));
+
+    // Fetch user's watched movies
+    fetch("http://localhost:3000/user/seenMovies", {
+      headers: {
+        "x-auth-token": localStorage.getItem("token"),
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setWatchedMovies(data.seenMovies.map((movie) => movie._id));
+      })
+      .catch((error) => console.log("Error fetching watched movies:", error));
+  };
+
   const formatRating = (rating) => {
     return `⭐ ${parseFloat(rating).toFixed(1)}`;
   };
-  
+
   const toggleLike = (event, movieId) => {
     event.preventDefault();
     const updatedLikedMovies = likedMovies.includes(movieId)
       ? likedMovies.filter((id) => id !== movieId)
       : [...likedMovies, movieId];
     setLikedMovies(updatedLikedMovies);
-    localStorage.setItem("likedMovies", JSON.stringify(updatedLikedMovies));
-    console.log("Updated Liked Movies:", updatedLikedMovies);
+    updateMovieList("likedMovies", updatedLikedMovies);
   };
 
   const toggleWatchlist = (event, movieId) => {
@@ -113,8 +145,7 @@ const MovieCards = ({ searchQuery, listType }) => {
       ? watchListedMovies.filter((id) => id !== movieId)
       : [...watchListedMovies, movieId];
     setWatchListedMovies(updatedWatchListedMovies);
-    localStorage.setItem("watchListedMovies", JSON.stringify(updatedWatchListedMovies));
-    console.log("Updated WatchListed Movies:", updatedWatchListedMovies);
+    updateMovieList("savedMovies", updatedWatchListedMovies);
   };
 
   const toggleSeen = (event, movieId) => {
@@ -123,8 +154,23 @@ const MovieCards = ({ searchQuery, listType }) => {
       ? watchedMovies.filter((id) => id !== movieId)
       : [...watchedMovies, movieId];
     setWatchedMovies(updatedWatchedMovies);
-    localStorage.setItem("watchedMovies", JSON.stringify(updatedWatchedMovies));
-    console.log("Updated Watched Movies:", updatedWatchedMovies);
+    updateMovieList("seenMovies", updatedWatchedMovies);
+  };
+
+  const updateMovieList = (listType, updatedList) => {
+    fetch(`http://localhost:3000/user/update/${listType}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-auth-token": localStorage.getItem("token"),
+      },
+      body: JSON.stringify({ movies: updatedList }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(`Updated ${listType} movies:`, data);
+      })
+      .catch((error) => console.log(`Error updating ${listType} movies:`, error));
   };
 
   const openModal = (movie) => {
@@ -166,7 +212,6 @@ const MovieCards = ({ searchQuery, listType }) => {
   const handleLanguageSearchChange = (event) => {
     setLanguageSearchTerm(event.target.value);
   };
-  
 
   const handleRatingSelect = (rating) => {
     setSelectedRating(rating);
@@ -201,7 +246,6 @@ const MovieCards = ({ searchQuery, listType }) => {
 
   return (
     <Container fluid className="px-7">
-      
       <Row className="mb-4">
         <Col>
           <Dropdown isOpen={genreDropdownOpen} toggle={toggleGenreDropdown}>
@@ -209,30 +253,29 @@ const MovieCards = ({ searchQuery, listType }) => {
               {selectedGenres.length === 0 ? "Todos los Géneros" : `${selectedGenres.length} genres selected`}
             </DropdownToggle>
             <DropdownMenu>
-            <DropdownItem>
+              <DropdownItem>
                 <input
-                type="text"
-                placeholder="Buscar género"
-                value={genreSearchTerm}
-                onChange={(e) => setGenreSearchTerm(e.target.value)}
-                onClick={(e) => e.stopPropagation()}
-                 />
-                 </DropdownItem>
-
-              <DropdownItem onClick={() => setSelectedGenres([])}>Limpiar selcción</DropdownItem>
+                  type="text"
+                  placeholder="Buscar género"
+                  value={genreSearchTerm}
+                  onChange={(e) => setGenreSearchTerm(e.target.value)}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </DropdownItem>
+              <DropdownItem onClick={() => setSelectedGenres([])}>Limpiar selección</DropdownItem>
               {genres
-              .filter((genre) =>
-              genre.name.toLowerCase().includes(genreSearchTerm.toLowerCase())
-            )
-            .map((genre) => (
-                <DropdownItem
-                  key={genre.id}
-                  onClick={() => handleGenreSelect(genre.id)}
-                  style={{ backgroundColor: selectedGenres.includes(genre.id) ? "#f0f0f0" : "transparent" }}
-                >
-                  {genre.name}
-                </DropdownItem>
-              ))}
+                .filter((genre) =>
+                  genre.name.toLowerCase().includes(genreSearchTerm.toLowerCase())
+                )
+                .map((genre) => (
+                  <DropdownItem
+                    key={genre.id}
+                    onClick={() => handleGenreSelect(genre.id)}
+                    style={{ backgroundColor: selectedGenres.includes(genre.id) ? "#f0f0f0" : "transparent" }}
+                  >
+                    {genre.name}
+                  </DropdownItem>
+                ))}
             </DropdownMenu>
           </Dropdown>
         </Col>
@@ -251,7 +294,7 @@ const MovieCards = ({ searchQuery, listType }) => {
                   onClick={(e) => e.stopPropagation()}
                 />
               </DropdownItem>
-              <DropdownItem onClick={() => setSelectedLanguages([])}>Limpiar selcción</DropdownItem>
+              <DropdownItem onClick={() => setSelectedLanguages([])}>Limpiar selección</DropdownItem>
               <DropdownItem divider />
               {filteredLanguages.map((language) => (
                 <DropdownItem
@@ -301,43 +344,43 @@ const MovieCards = ({ searchQuery, listType }) => {
                   }
                 />
                 <Row className="justify-content-center mt-1">
-                    <Col xs="auto">
-                      <div
-                        className={`heart-icon ${
-                          likedMovies.includes(movie.id) ? "liked" : ""
-                        }`}
-                        onClick={(e) => toggleLike(e, movie.id)}
-                        title="Añadir a favoritos"
-                      >
-                        <i className="fa fa-heart" />
-                      </div>
-                    </Col>
-                    <Col xs="auto">
-                      <div
-                        className={`heart-icon ${
-                          watchListedMovies.includes(movie.id)
-                            ? "watchlisted"
-                            : ""
-                        }`}
-                        onClick={(e) => toggleWatchlist(e, movie.id)}
-                        title="Añadir a tu watchlist"
-                      >
-                        <i className="fa fa-bookmark" />
-                      </div>
-                    </Col>
-                    <Col xs="auto">
-                      <div
-                        className={`heart-icon ${
-                          watchedMovies.includes(movie.id) ? "seen" : ""
-                        }`}
-                        onClick={(e) => toggleSeen(e, movie.id)}
-                        title="Marcar como visto"
-                      >
-                        <i className="fa fa-eye" />
-                      </div>
-                    </Col>
-                  </Row>
-                  <hr className="mt-1 mb-1" />{" "}
+                  <Col xs="auto">
+                    <div
+                      className={`heart-icon ${
+                        likedMovies.includes(movie.id) ? "liked" : ""
+                      }`}
+                      onClick={(e) => toggleLike(e, movie.id)}
+                      title="Añadir a favoritos"
+                    >
+                      <i className="fa fa-heart" />
+                    </div>
+                  </Col>
+                  <Col xs="auto">
+                    <div
+                      className={`heart-icon ${
+                        watchListedMovies.includes(movie.id)
+                          ? "watchlisted"
+                          : ""
+                      }`}
+                      onClick={(e) => toggleWatchlist(e, movie.id)}
+                      title="Añadir a tu watchlist"
+                    >
+                      <i className="fa fa-bookmark" />
+                    </div>
+                  </Col>
+                  <Col xs="auto">
+                    <div
+                      className={`heart-icon ${
+                        watchedMovies.includes(movie.id) ? "seen" : ""
+                      }`}
+                      onClick={(e) => toggleSeen(e, movie.id)}
+                      title="Marcar como visto"
+                    >
+                      <i className="fa fa-eye" />
+                    </div>
+                  </Col>
+                </Row>
+                <hr className="mt-1 mb-1" />
               </div>
               <CardBody className="p-2 d-flex flex-column" onClick={() => openModal(movie)}>
                 <div className="flex-grow-1">

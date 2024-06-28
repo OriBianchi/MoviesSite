@@ -40,6 +40,7 @@ const Profile = () => {
             "x-auth-token": token,
           },
         });
+        console.log(token);
         const data = await response.json();
         if (response.ok) {
           setUserData(data);
