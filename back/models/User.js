@@ -15,7 +15,23 @@ const UserSchema = new Schema({
   password: {
     type: String,
     required: true
+  },
+  likedMovies: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Movie'
+  }],
+  seenMovies: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Movie'
+  }],
+  savedMovies: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Movie'
+  }],
+  creationDate: {
+    type: Date,
+    default: Date.now
   }
-}, { collection: 'users' }); // Specify collection name
+}, { collection: 'users' });
 
 module.exports = mongoose.model('User', UserSchema);
