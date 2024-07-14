@@ -14,13 +14,11 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "reactstrap";
-import "./MovieCards.css";
+import "./MovieCardsList.css";
 import ContentModal from "./ContentModal";
 
-const MovieCards = ({ searchQuery, listType }) => {
+const MovieCardsList = ({ searchQuery, listType }) => {
   const [movies, setMovies] = useState([]);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
   const [likedMovies, setLikedMovies] = useState([]);
   const [watchListedMovies, setWatchListedMovies] = useState([]);
   const [watchedMovies, setWatchedMovies] = useState([]);
@@ -39,10 +37,12 @@ const MovieCards = ({ searchQuery, listType }) => {
   useEffect(() => {
     fetchGenres();
     fetchLanguages();
-    fetchMovies();
-    // Fetch user's liked, watchlisted, and watched movies from backend on component mount
     fetchUserMovieLists();
-  }, [page, searchQuery, selectedGenres, selectedLanguages, selectedRating]);
+  }, []);
+
+  useEffect(() => {
+    fetchMovies();
+  }, [likedMovies, watchListedMovies, watchedMovies, listType]);
 
   const fetchGenres = () => {
     fetch(
@@ -67,29 +67,40 @@ const MovieCards = ({ searchQuery, listType }) => {
   };
 
   const fetchMovies = () => {
-    const query = searchQuery ? `&query=${searchQuery}` : "";
-    const genreQuery =
-      selectedGenres.length > 0 ? `&with_genres=${selectedGenres.join(",")}` : "";
-    const languageQuery =
-      selectedLanguages.length > 0
-        ? `&with_original_language=${selectedLanguages.join(",")}`
-        : "";
-    const ratingQuery = selectedRating ? `&vote_average.gte=${selectedRating}` : "";
-    const apiUrl = searchQuery
-      ? `https://api.themoviedb.org/3/search/movie?api_key=73a2526073ff49d6c8aa48eba5e42531${query}&page=${page}&language=es`
-      : `https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=73a2526073ff49d6c8aa48eba5e42531&page=${page}&language=es${genreQuery}${languageQuery}${ratingQuery}`;
+    let movieIds = [];
+    switch (listType) {
+      case "liked":
+        movieIds = likedMovies;
+        break;
+      case "bookmarked":
+        movieIds = watchListedMovies;
+        break;
+      case "seen":
+        movieIds = watchedMovies;
+        break;
+      default:
+        movieIds = [];
+    }
 
-    fetch(apiUrl)
-      .then((response) => response.json())
+    if (movieIds.length === 0) {
+      setMovies([]);
+      return;
+    }
+
+    const fetchPromises = movieIds.map((id) =>
+      fetch(
+        `https://api.themoviedb.org/3/movie/${id}?api_key=73a2526073ff49d6c8aa48eba5e42531&language=es`
+      ).then((response) => response.json())
+    );
+
+    Promise.all(fetchPromises)
       .then((data) => {
-        setMovies(data.results.slice(0, 18));
-        setTotalPages(data.total_pages);
+        setMovies(data);
       })
-      .catch((error) => console.log("Error fetching data:", error));
+      .catch((error) => console.log("Error fetching movie details:", error));
   };
 
   const fetchUserMovieLists = () => {
-    // Fetch user's liked movies
     fetch("http://localhost:5000/api/users/user/get/likedMovies", {
       headers: {
         "x-auth-token": localStorage.getItem("token"),
@@ -97,111 +108,38 @@ const MovieCards = ({ searchQuery, listType }) => {
     })
       .then((response) => response.json())
       .then((data) => {
-        setLikedMovies(data.likedMovies.map((movie) => movie._id));
+        const likedMoviesArray = Array.isArray(data) ? data.map(Number) : [];
+        setLikedMovies(likedMoviesArray);
+      })
+      .catch((error) => console.log("Error fetching liked movies:", error));
 
-        // Fetch user's watchlisted movies after fetching liked movies
-        fetch("http://localhost:5000/api/users/user/get/savedMovies", {
+    fetch("http://localhost:5000/api/users/user/get/savedMovies", {
+      headers: {
+        "x-auth-token": localStorage.getItem("token"),
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const savedMoviesArray = Array.isArray(data) ? data.map(Number) : [];
+        setWatchListedMovies(savedMoviesArray);
+
+        fetch("http://localhost:5000/api/users/user/get/seenMovies", {
           headers: {
             "x-auth-token": localStorage.getItem("token"),
           },
         })
           .then((response) => response.json())
           .then((data) => {
-            setWatchListedMovies(data.savedMovies.map((movie) => movie._id));
-
-            // Fetch user's watched movies after fetching watchlisted movies
-            fetch("http://localhost:5000/api/users/user/get/seenMovies", {
-              headers: {
-                "x-auth-token": localStorage.getItem("token"),
-              },
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                setWatchedMovies(data.seenMovies.map((movie) => movie._id));
-              })
-              .catch((error) => console.log("Error fetching watched movies:", error));
+            const seenMoviesArray = Array.isArray(data) ? data.map(Number) : [];
+            setWatchedMovies(seenMoviesArray);
           })
-          .catch((error) => console.log("Error fetching watchlisted movies:", error));
+          .catch((error) => console.log("Error fetching watched movies:", error));
       })
-      .catch((error) => console.log("Error fetching liked movies:", error));
+      .catch((error) => console.log("Error fetching watchlisted movies:", error));
   };
 
   const formatRating = (rating) => {
     return `⭐ ${parseFloat(rating).toFixed(1)}`;
-  };
-
-  const toggleLike = (event, movieId) => {
-    event.preventDefault();
-    const updatedLikedMovies = likedMovies.includes(movieId)
-      ? likedMovies.filter((id) => id !== movieId)
-      : [...likedMovies, movieId];
-      setLikedMovies(updatedLikedMovies);
-      if (likedMovies.includes(movieId)) {
-        removeMovieFromList("likedMovies", movieId);
-      } else {
-        addMovieToList("likedMovies", movieId);
-      }
-  };
-
-  const toggleWatchlist = (event, movieId) => {
-    event.preventDefault();
-    const updatedWatchListedMovies = watchListedMovies.includes(movieId)
-      ? watchListedMovies.filter((id) => id !== movieId)
-      : [...watchListedMovies, movieId];
-    setWatchListedMovies(updatedWatchListedMovies);
-    if (watchListedMovies.includes(movieId)) {
-      removeMovieFromList("savedMovies", movieId);
-    } else {
-      addMovieToList("savedMovies", movieId);
-    }
-  };
-
-  const toggleSeen = (event, movieId) => {
-    event.preventDefault();
-    const updatedWatchedMovies = watchedMovies.includes(movieId)
-
-      ? watchedMovies.filter((id) => id !== movieId)
-      : [...watchedMovies, movieId];
-      console.log("WATCHED MOVIES" + watchedMovies)
-      console.log("UPDATED MOVIES" + updatedWatchedMovies)
-    setWatchedMovies(updatedWatchedMovies);
-    if (watchedMovies.includes(movieId)) {
-      removeMovieFromList("seenMovies", movieId);
-    } else {
-      addMovieToList("seenMovies", movieId);
-    }
-  };
-
-  const addMovieToList = (listType, movieID) => {
-    fetch(`http://localhost:5000/api/users/user/add/${listType}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-auth-token": localStorage.getItem("token"),
-      },
-      body: JSON.stringify({ "movieId": movieID }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(`Updated ${listType} movies:`, data);
-      })
-      .catch((error) => console.log(`Error updating ${listType} movies:`, error));
-  };
-
-  const removeMovieFromList = (listType, movieID) => {
-    fetch(`http://localhost:5000/api/users/user/delete/${listType}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-auth-token": localStorage.getItem("token"),
-      },
-      body: JSON.stringify({ "movieId": movieID }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(`Updated ${listType} movies:`, data);
-      })
-      .catch((error) => console.log(`Error updating ${listType} movies:`, error));
   };
 
   const openModal = (movie) => {
@@ -260,28 +198,15 @@ const MovieCards = ({ searchQuery, listType }) => {
     xl: 2,
   };
 
-  let filteredMovies;
-  switch (listType) {
-    case "liked":
-      filteredMovies = movies.filter((movie) => likedMovies.includes(movie.id));
-      break;
-    case "bookmarked":
-      filteredMovies = movies.filter((movie) => watchListedMovies.includes(movie.id));
-      break;
-    case "seen":
-      filteredMovies = movies.filter((movie) => watchedMovies.includes(movie.id));
-      break;
-    default:
-      filteredMovies = movies;
-  }
-
   return (
     <Container fluid className="px-7">
       <Row className="mb-4">
         <Col>
           <Dropdown isOpen={genreDropdownOpen} toggle={toggleGenreDropdown}>
             <DropdownToggle caret>
-              {selectedGenres.length === 0 ? "Todos los Géneros" : `${selectedGenres.length} genres selected`}
+              {selectedGenres.length === 0
+                ? "Todos los Géneros"
+                : `${selectedGenres.length} genres selected`}
             </DropdownToggle>
             <DropdownMenu>
               <DropdownItem>
@@ -302,7 +227,11 @@ const MovieCards = ({ searchQuery, listType }) => {
                   <DropdownItem
                     key={genre.id}
                     onClick={() => handleGenreSelect(genre.id)}
-                    style={{ backgroundColor: selectedGenres.includes(genre.id) ? "#f0f0f0" : "transparent" }}
+                    style={{
+                      backgroundColor: selectedGenres.includes(genre.id)
+                        ? "#f0f0f0"
+                        : "transparent",
+                    }}
                   >
                     {genre.name}
                   </DropdownItem>
@@ -313,7 +242,9 @@ const MovieCards = ({ searchQuery, listType }) => {
         <Col>
           <Dropdown isOpen={languageDropdownOpen} toggle={toggleLanguageDropdown}>
             <DropdownToggle caret>
-              {selectedLanguages.length === 0 ? "Todos los idiomas" : `${selectedLanguages.length} languages selected`}
+              {selectedLanguages.length === 0
+                ? "Todos los idiomas"
+                : `${selectedLanguages.length} languages selected`}
             </DropdownToggle>
             <DropdownMenu>
               <DropdownItem>
@@ -331,7 +262,11 @@ const MovieCards = ({ searchQuery, listType }) => {
                 <DropdownItem
                   key={language.iso_639_1}
                   onClick={() => handleLanguageSelect(language.iso_639_1)}
-                  style={{ backgroundColor: selectedLanguages.includes(language.iso_639_1) ? "#f0f0f0" : "transparent" }}
+                  style={{
+                    backgroundColor: selectedLanguages.includes(language.iso_639_1)
+                      ? "#f0f0f0"
+                      : "transparent",
+                  }}
                 >
                   {language.english_name}
                 </DropdownItem>
@@ -350,7 +285,9 @@ const MovieCards = ({ searchQuery, listType }) => {
                 <DropdownItem
                   key={rating}
                   onClick={() => handleRatingSelect(rating)}
-                  style={{ backgroundColor: selectedRating === rating ? "#f0f0f0" : "transparent" }}
+                  style={{
+                    backgroundColor: selectedRating === rating ? "#f0f0f0" : "transparent",
+                  }}
                 >
                   {rating} o más
                 </DropdownItem>
@@ -360,7 +297,7 @@ const MovieCards = ({ searchQuery, listType }) => {
         </Col>
       </Row>
       <Row xs="2" sm="3" md="4" lg="5">
-        {filteredMovies.map((movie, index) => (
+        {movies.map((movie, index) => (
           <Col key={index} className="mb-2 mb-md-4" {...columnSettings}>
             <Card className="shadow movie-card">
               <div className="position-relative">
@@ -377,10 +314,7 @@ const MovieCards = ({ searchQuery, listType }) => {
                 <Row className="justify-content-center mt-1">
                   <Col xs="auto">
                     <div
-                      className={`heart-icon ${
-                        likedMovies.includes(movie.id) ? "liked" : ""
-                      }`}
-                      onClick={(e) => toggleLike(e, movie.id)}
+                      className={`icon ${likedMovies.includes(movie.id) ? "liked" : ""}`}
                       title="Añadir a favoritos"
                     >
                       <i className="fa fa-heart" />
@@ -388,12 +322,7 @@ const MovieCards = ({ searchQuery, listType }) => {
                   </Col>
                   <Col xs="auto">
                     <div
-                      className={`heart-icon ${
-                        watchListedMovies.includes(movie.id)
-                          ? "watchlisted"
-                          : ""
-                      }`}
-                      onClick={(e) => toggleWatchlist(e, movie.id)}
+                      className={`icon ${watchListedMovies.includes(movie.id) ? "watchlisted" : ""}`}
                       title="Añadir a tu watchlist"
                     >
                       <i className="fa fa-bookmark" />
@@ -401,10 +330,7 @@ const MovieCards = ({ searchQuery, listType }) => {
                   </Col>
                   <Col xs="auto">
                     <div
-                      className={`heart-icon ${
-                        watchedMovies.includes(movie.id) ? "seen" : ""
-                      }`}
-                      onClick={(e) => toggleSeen(e, movie.id)}
+                      className={`icon ${watchedMovies.includes(movie.id) ? "seen" : ""}`}
                       title="Marcar como visto"
                     >
                       <i className="fa fa-eye" />
@@ -415,7 +341,9 @@ const MovieCards = ({ searchQuery, listType }) => {
               </div>
               <CardBody className="p-2 d-flex flex-column" onClick={() => openModal(movie)}>
                 <div className="flex-grow-1">
-                  <CardTitle className="text-center mb-1 mt-0 movie-title">{movie.title}</CardTitle>
+                  <CardTitle className="text-center mb-1 mt-0 movie-title">
+                    {movie.title}
+                  </CardTitle>
                   <CardText className="text-center mb-1 mt-0">
                     ({new Date(movie.release_date).getFullYear()})
                   </CardText>
@@ -426,33 +354,9 @@ const MovieCards = ({ searchQuery, listType }) => {
           </Col>
         ))}
       </Row>
-      <Row className="justify-content-center mt-4">
-        <Col xs="auto">
-          <Button
-            color="primary"
-            onClick={() => {
-              setPage((prevPage) => prevPage - 1);
-              window.scrollTo(0, 0);
-            }}
-            disabled={page === 1}
-          >
-            Previous
-          </Button>
-          <Button
-            color="primary"
-            onClick={() => {
-              setPage((prevPage) => prevPage + 1);
-              window.scrollTo(0, 0);
-            }}
-            disabled={page === totalPages}
-          >
-            Next
-          </Button>
-        </Col>
-      </Row>
       <ContentModal modalMovie={modalMovie} toggleModal={closeModal} />
     </Container>
   );
 };
 
-export default MovieCards;
+export default MovieCardsList;

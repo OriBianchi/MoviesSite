@@ -16,7 +16,7 @@ import {
 } from "reactstrap";
 import NavBar_LoggedIn from "components/Navbars/NavBar_LoggedIn.js";
 import SimpleFooter from "components/Footers/SimpleFooter.js";
-import MovieCards from "components/Custom/Main/MovieCards.js";
+import MovieCards from "components/Custom/Main/MovieCardsList.js";
 import "components/Custom/Main/MovieCards.css";
 import classnames from "classnames";
 

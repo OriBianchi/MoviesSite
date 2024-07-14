@@ -35,12 +35,12 @@ const MovieCards = ({ searchQuery, listType }) => {
   const [ratingDropdownOpen, setRatingDropdownOpen] = useState(false);
   const [selectedRating, setSelectedRating] = useState(null);
   const [genreSearchTerm, setGenreSearchTerm] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchGenres();
     fetchLanguages();
     fetchMovies();
-    // Fetch user's liked, watchlisted, and watched movies from backend on component mount
     fetchUserMovieLists();
   }, [page, searchQuery, selectedGenres, selectedLanguages, selectedRating]);
 
@@ -89,7 +89,6 @@ const MovieCards = ({ searchQuery, listType }) => {
   };
 
   const fetchUserMovieLists = () => {
-    // Fetch user's liked movies
     fetch("http://localhost:5000/api/users/user/get/likedMovies", {
       headers: {
         "x-auth-token": localStorage.getItem("token"),
@@ -97,83 +96,98 @@ const MovieCards = ({ searchQuery, listType }) => {
     })
       .then((response) => response.json())
       .then((data) => {
-        setLikedMovies(data.likedMovies.map((movie) => movie._id));
-
-        // Fetch user's watchlisted movies after fetching liked movies
-        fetch("http://localhost:5000/api/users/user/get/savedMovies", {
+        // Convert each element to an integer
+        const likedMoviesArray = Array.isArray(data) ? data.map(Number) : [];
+        console.log("data:", data);
+        console.log("LikedMovies data type:", typeof data);
+        console.log("likedMoviesArray:", likedMoviesArray);
+        setLikedMovies(likedMoviesArray);
+      })
+      .catch((error) => console.log("Error fetching liked movies:", error));
+  
+    fetch("http://localhost:5000/api/users/user/get/savedMovies", {
+      headers: {
+        "x-auth-token": localStorage.getItem("token"),
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const savedMoviesArray = Array.isArray(data) ? data.map(Number) : [];
+        setWatchListedMovies(savedMoviesArray);
+  
+        fetch("http://localhost:5000/api/users/user/get/seenMovies", {
           headers: {
             "x-auth-token": localStorage.getItem("token"),
           },
         })
           .then((response) => response.json())
           .then((data) => {
-            setWatchListedMovies(data.savedMovies.map((movie) => movie._id));
-
-            // Fetch user's watched movies after fetching watchlisted movies
-            fetch("http://localhost:5000/api/users/user/get/seenMovies", {
-              headers: {
-                "x-auth-token": localStorage.getItem("token"),
-              },
-            })
-              .then((response) => response.json())
-              .then((data) => {
-                setWatchedMovies(data.seenMovies.map((movie) => movie._id));
-              })
-              .catch((error) => console.log("Error fetching watched movies:", error));
+            const seenMoviesArray = Array.isArray(data) ? data.map(Number) : [];
+            setWatchedMovies(seenMoviesArray);
           })
-          .catch((error) => console.log("Error fetching watchlisted movies:", error));
+          .catch((error) => console.log("Error fetching watched movies:", error));
       })
-      .catch((error) => console.log("Error fetching liked movies:", error));
+      .catch((error) => console.log("Error fetching watchlisted movies:", error));
   };
+  
+  
 
   const formatRating = (rating) => {
     return `⭐ ${parseFloat(rating).toFixed(1)}`;
   };
 
   const toggleLike = (event, movieId) => {
-    console.log(likedMovies);
     event.preventDefault();
-    const updatedLikedMovies = likedMovies.includes(movieId)
-      ? likedMovies.filter((id) => id !== movieId)
-      : [...likedMovies, movieId];
-      setLikedMovies(updatedLikedMovies);
-      if (likedMovies.includes(movieId)) {
-        console.log("Entro remove");
+    setLikedMovies((prevLikedMovies) => {
+      const isLiked = prevLikedMovies.includes(movieId);
+      const updatedLikedMovies = isLiked
+        ? prevLikedMovies.filter((id) => id !== movieId)
+        : [...prevLikedMovies, movieId];
+
+      if (isLiked) {
         removeMovieFromList("likedMovies", movieId);
       } else {
-        console.log("Entro add");
         addMovieToList("likedMovies", movieId);
       }
-      console.log(likedMovies);
+
+      return updatedLikedMovies;
+    });
   };
 
   const toggleWatchlist = (event, movieId) => {
     event.preventDefault();
-    const updatedWatchListedMovies = watchListedMovies.includes(movieId)
-      ? watchListedMovies.filter((id) => id !== movieId)
-      : [...watchListedMovies, movieId];
-    setWatchListedMovies(updatedWatchListedMovies);
-    if (watchListedMovies.includes(movieId)) {
-      removeMovieFromList("savedMovies", movieId);
-    } else {
-      addMovieToList("savedMovies", movieId);
-    }
+    setWatchListedMovies((prevWatchListedMovies) => {
+      const isWatchListed = prevWatchListedMovies.includes(movieId);
+      const updatedWatchListedMovies = isWatchListed
+        ? prevWatchListedMovies.filter((id) => id !== movieId)
+        : [...prevWatchListedMovies, movieId];
+
+      if (isWatchListed) {
+        removeMovieFromList("savedMovies", movieId);
+      } else {
+        addMovieToList("savedMovies", movieId);
+      }
+
+      return updatedWatchListedMovies;
+    });
   };
 
   const toggleSeen = (event, movieId) => {
     event.preventDefault();
-    const updatedWatchedMovies = watchedMovies.includes(movieId)
+    setWatchedMovies((prevWatchedMovies) => {
+      const isSeen = prevWatchedMovies.includes(movieId);
+      const updatedWatchedMovies = isSeen
+        ? prevWatchedMovies.filter((id) => id !== movieId)
+        : [...prevWatchedMovies, movieId];
 
-      ? watchedMovies.filter((id) => id !== movieId)
-      : [...watchedMovies, movieId];
-      console.log("WATCHED MOVIES" + watchedMovies)
-      console.log("UPDATED MOVIES" + updatedWatchedMovies)
-    setWatchedMovies(updatedWatchedMovies);
-    if (watchedMovies.includes(movieId)) {
-      removeMovieFromList("seenMovies", movieId);
-    } else {
-      addMovieToList("seenMovies", movieId);
-    }
+      if (isSeen) {
+        removeMovieFromList("seenMovies", movieId);
+      } else {
+        addMovieToList("seenMovies", movieId);
+      }
+
+      return updatedWatchedMovies;
+    });
   };
 
   const addMovieToList = (listType, movieID) => {
@@ -183,7 +197,7 @@ const MovieCards = ({ searchQuery, listType }) => {
         "Content-Type": "application/json",
         "x-auth-token": localStorage.getItem("token"),
       },
-      body: JSON.stringify({ "movieId": movieID }),
+      body: JSON.stringify({ movieId: movieID }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -199,7 +213,7 @@ const MovieCards = ({ searchQuery, listType }) => {
         "Content-Type": "application/json",
         "x-auth-token": localStorage.getItem("token"),
       },
-      body: JSON.stringify({ "movieId": movieID }),
+      body: JSON.stringify({ movieId: movieID }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -243,8 +257,6 @@ const MovieCards = ({ searchQuery, listType }) => {
       setSelectedLanguages([...selectedLanguages, language]);
     }
   };
-
-  console.log(localStorage.getItem("token"));
 
   const handleLanguageSearchChange = (event) => {
     setLanguageSearchTerm(event.target.value);
@@ -389,8 +401,13 @@ const MovieCards = ({ searchQuery, listType }) => {
                       onClick={(e) => toggleLike(e, movie.id)}
                       title="Añadir a favoritos"
                     >
+
                       <i className="fa fa-heart" />
                     </div>
+{/* 
+                    {console.log("LikedMovies", likedMovies)}
+                    {console.log("MovieID", movie.id)}
+                    {console.log("INCLUDES?", likedMovies.includes(movie.id))} */}
                   </Col>
                   <Col xs="auto">
                     <div
