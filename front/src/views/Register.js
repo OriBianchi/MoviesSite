@@ -24,6 +24,7 @@ const Register = () => {
   const [usernameError, setUsernameError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [serverError, setServerError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -53,19 +54,32 @@ const Register = () => {
     setConfirmPasswordError("");
   };
 
+  const validateUsername = (username) => {
+    const usernamePattern = /^[a-zA-Z]{6,}$/;
+    return usernamePattern.test(username);
+  };
+
+  const validatePassword = (password) => {
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!#$%&/*+.])[A-Za-z\d!#$%&/*+.]{7,}$/;
+    return passwordPattern.test(password);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setPasswordError("");
+    setUsernameError("");
+    setEmailError("");
+    setConfirmPasswordError("");
     // Validate input fields
-    if (!username || !validateEmail(email) || !password || password !== confirmPassword) {
-      if (!username) {
-        setUsernameError("Por favor, ingrese un nombre de usuario.");
+    if (!username || !validateUsername(username) || !validateEmail(email) || !password || !validatePassword(password) || password !== confirmPassword) {
+      if (!username || !validateUsername(username)) {
+        setUsernameError("El nombre de usuario debe tener al menos 6 caracteres y solo contener letras.");
       }
       if (!validateEmail(email)) {
         setEmailError("Por favor, ingrese un correo electrónico válido.");
       }
-      if (!password) {
-        setPasswordError("Por favor, ingrese una contraseña.");
+      if (!password || !validatePassword(password)) {
+        setPasswordError("La contraseña debe tener al menos 7 caracteres, incluyendo al menos una letra minúscula, una letra mayúscula, un número y un símbolo entre !#$%&/*+.");
       }
       if (password !== confirmPassword) {
         setConfirmPasswordError("Las contraseñas no coinciden.");
@@ -144,13 +158,13 @@ const Register = () => {
         setIsLoading(false);
       }
     } catch (error) {
-      console.error("Error during registration:", error);
+      setServerError("Error interno del servidor.");
+      console.log(serverError);
       setIsLoading(false);
     }
   };
 
   const validateEmail = (email) => {
-    // Email regex pattern
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailPattern.test(email);
   };
@@ -251,11 +265,15 @@ const Register = () => {
                           <small className="text-danger">{confirmPasswordError}</small>
                         )}
                       </FormGroup>
+                      {serverError && (
+                          <small className="text-danger">{serverError}</small>
+                        )}
                       {registrationSuccess && (
                         <div className="alert alert-success mb-3" role="alert">
                           Registro exitoso. Redirigiendo a iniciar sesión...
                         </div>
                       )}
+                      
                       <div className="text-center">
                         <Button
                           className="mt-4"

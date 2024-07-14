@@ -131,20 +131,16 @@ const MovieCards = ({ searchQuery, listType }) => {
   };
 
   const toggleLike = (event, movieId) => {
-    console.log(likedMovies);
     event.preventDefault();
     const updatedLikedMovies = likedMovies.includes(movieId)
       ? likedMovies.filter((id) => id !== movieId)
       : [...likedMovies, movieId];
       setLikedMovies(updatedLikedMovies);
       if (likedMovies.includes(movieId)) {
-        console.log("Entro remove");
         removeMovieFromList("likedMovies", movieId);
       } else {
-        console.log("Entro add");
         addMovieToList("likedMovies", movieId);
       }
-      console.log(likedMovies);
   };
 
   const toggleWatchlist = (event, movieId) => {
@@ -187,14 +183,14 @@ const MovieCards = ({ searchQuery, listType }) => {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(`ADDED TO ${listType} movies:`, data);
+        console.log(`Updated ${listType} movies:`, data);
       })
       .catch((error) => console.log(`Error updating ${listType} movies:`, error));
   };
 
   const removeMovieFromList = (listType, movieID) => {
     fetch(`http://localhost:5000/api/users/user/delete/${listType}`, {
-      method: "DELETE",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         "x-auth-token": localStorage.getItem("token"),
@@ -203,7 +199,7 @@ const MovieCards = ({ searchQuery, listType }) => {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(`REMOVED FROM ${listType} movies:`, data);
+        console.log(`Updated ${listType} movies:`, data);
       })
       .catch((error) => console.log(`Error updating ${listType} movies:`, error));
   };
@@ -243,8 +239,6 @@ const MovieCards = ({ searchQuery, listType }) => {
       setSelectedLanguages([...selectedLanguages, language]);
     }
   };
-
-  console.log(localStorage.getItem("token"));
 
   const handleLanguageSearchChange = (event) => {
     setLanguageSearchTerm(event.target.value);

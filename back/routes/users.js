@@ -76,7 +76,7 @@ router.get('/user/get/:list', auth, async (req, res) => {
 });
 
 // Remove movie ID from user's list
-router.post('/user/delete/:list', auth, async (req, res) => {
+router.delete('/user/delete/:list', auth, async (req, res) => {
   const { list } = req.params;
   const { movieId } = req.body;
 
@@ -93,7 +93,15 @@ router.post('/user/delete/:list', auth, async (req, res) => {
     }
 
     // Remove the movieId from the specified list
-    user[list] = user[list].filter(id => id.toString() !== movieId);
+    const updatedList = user[list].filter(id => id.toString() !== movieId.toString());
+    console.log(updatedList);
+
+    
+    if (updatedList.length === user[list].length) {
+      return res.status(404).json({ message: 'Movie not found in the list.' });
+    }
+
+    user[list] = updatedList;
     await user.save();
 
     // Return the updated user object with the modified list
@@ -103,6 +111,7 @@ router.post('/user/delete/:list', auth, async (req, res) => {
     res.status(500).json({ message: 'Server Error.' });
   }
 });
+
 
 // Register a new user
 router.post('/register', async (req, res) => {
