@@ -70,7 +70,7 @@ const LostPasswordModal = ({ isOpen, toggle }) => {
 
   return (
     <Modal isOpen={isOpen} toggle={toggle} size="sm" className="modal-dialog-centered" style={{ maxWidth: '500px' }}>
-      <Card className="d-flex flex-column h-100 w-100">
+      <Card className="d-flex flex-column h-1 w-100">
         <CardHeader className="bg-white pb-5 w-100">
           <div className="d-flex justify-content-between align-items-center">
             <div className="text-muted">
@@ -79,9 +79,10 @@ const LostPasswordModal = ({ isOpen, toggle }) => {
             <button type="button" className="close" aria-label="Close" onClick={toggle}>
               <span aria-hidden="true">&times;</span>
             </button>
+            
           </div>
         </CardHeader>
-        <CardBody className="px-lg-10 py-lg-10 w-100" style={{ maxWidth: '400px', margin: '0 auto' }}>
+        <CardBody className="px-lg-10 py-lg-3 w-100" style={{ maxWidth: '400px', margin: '0 auto' }}>
           <Form role="form">
             <FormGroup>
               <Label for="email">Correo Electrónico</Label>

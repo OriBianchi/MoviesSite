@@ -1,12 +1,18 @@
+// ChangePasswordModal.js
 import React, { useState, useEffect } from "react";
 import { Modal, Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, InputGroupText, Button, Form, Label } from "reactstrap";
 
-const ChangePasswordModal = ({ isOpen, toggle }) => {
+const ChangePasswordModal = ({ isOpen, toggle, onPasswordChange }) => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [validationErrors, setValidationErrors] = useState({});
   const [confirmationMessage, setConfirmationMessage] = useState("");
+
+  const validatePassword = (password) => {
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!#$%&/*+.])[A-Za-z\d!#$%&/*+.]{7,}$/;
+    return passwordPattern.test(password);
+  };
 
   useEffect(() => {
     if (!isOpen) {
@@ -34,27 +40,18 @@ const ChangePasswordModal = ({ isOpen, toggle }) => {
   }, [confirmationMessage, toggle]);
 
   const handleOldPasswordChange = (e) => {
-    const value = e.target.value;
-    if (/^[a-zA-Z0-9!@#$%^&*_+=]*$/.test(value)) {
-      setOldPassword(value);
-    }
+    setOldPassword(e.target.value);
   };
 
   const handleNewPasswordChange = (e) => {
-    const value = e.target.value;
-    if (/^[a-zA-Z0-9!@#$%^&*_+=]*$/.test(value)) {
-      setNewPassword(value);
-    }
+    setNewPassword(e.target.value);
   };
 
   const handleConfirmPasswordChange = (e) => {
-    const value = e.target.value;
-    if (/^[a-zA-Z0-9!@#$%^&*_+=]*$/.test(value)) {
-      setConfirmPassword(value);
-    }
+    setConfirmPassword(e.target.value);
   };
 
-  const handlePasswordChange = () => {
+  const handlePasswordChange = async () => {
     if (!oldPassword || !newPassword || !confirmPassword) {
       setValidationErrors({
         oldPassword: !oldPassword ? "La contraseña actual es requerida." : "",
@@ -64,23 +61,9 @@ const ChangePasswordModal = ({ isOpen, toggle }) => {
       return;
     }
 
-    if (!/^[a-zA-Z0-9!@#$%^&*_+=]*$/.test(oldPassword)) {
+    if (!validatePassword(newPassword)) {
       setValidationErrors({
-        oldPassword: "La contraseña actual debe contener solo letras, números o los siguientes símbolos: !@#$%^&*_+=",
-      });
-      return;
-    }
-
-    if (!/^[a-zA-Z0-9!@#$%^&*_+=]*$/.test(newPassword)) {
-      setValidationErrors({
-        newPassword: "La nueva contraseña debe contener solo letras, números o los siguientes símbolos: !@#$%^&*_+=",
-      });
-      return;
-    }
-
-    if (!/^[a-zA-Z0-9!@#$%^&*_+=]*$/.test(confirmPassword)) {
-      setValidationErrors({
-        confirmPassword: "La confirmación de contraseña debe contener solo letras, números o los siguientes símbolos: !@#$%^&*_+=",
+        newPassword: "La contraseña debe tener al menos 7 caracteres, incluyendo al menos una letra minúscula, una letra mayúscula, un número y un símbolo entre !#$%&/*+.",
       });
       return;
     }
@@ -92,8 +75,28 @@ const ChangePasswordModal = ({ isOpen, toggle }) => {
       return;
     }
 
-    // Password change logic here
-    setConfirmationMessage("Contraseña cambiada exitosamente");
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:5000/api/auth/change-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-auth-token": token,
+        },
+        body: JSON.stringify({ oldPassword, newPassword }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setConfirmationMessage("Contraseña cambiada exitosamente");
+        onPasswordChange();
+      } else {
+        setValidationErrors({ oldPassword: data.message });
+      }
+    } catch (error) {
+      console.error("Error changing password", error);
+    }
   };
 
   return (
