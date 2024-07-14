@@ -21,7 +21,7 @@ const auth = (req, res, next) => {
     next();
   } catch (err) {
     console.error('Error verifying token:', err);
-    res.status(401).json({ message: 'Token is not valid.' });
+    res.status(401).json({ message: 'Token inválido.' });
   }
 };
 
@@ -39,7 +39,7 @@ router.post('/user/add/:list', auth, async (req, res) => {
     // Find the user by ID and update the respective list
     const user = await User.findById(req.user.id);
     if (!user) {
-      return res.status(404).json({ message: 'User not found.' });
+      return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
 
     // Update the specified list if the movieId is not already included
@@ -52,7 +52,7 @@ router.post('/user/add/:list', auth, async (req, res) => {
     res.json(user);
   } catch (err) {
     console.error('Error adding movie to list:', err);
-    res.status(500).json({ message: 'Server Error.' });
+    res.status(500).json({ message: 'Error de servidor.' });
   }
 });
 
@@ -64,14 +64,14 @@ router.get('/user/get/:list', auth, async (req, res) => {
     // Find the user by ID and fetch the respective list
     const user = await User.findById(req.user.id);
     if (!user) {
-      return res.status(404).json({ message: 'User not found.' });
+      return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
 
     // Return the specified list
     res.json(user[list]);
   } catch (err) {
     console.error('Error fetching user list:', err);
-    res.status(500).json({ message: 'Server Error.' });
+    res.status(500).json({ message: 'Error de servidor.' });
   }
 });
 
@@ -83,13 +83,13 @@ router.delete('/user/delete/:list', auth, async (req, res) => {
   try {
     // Check if movieId is provided
     if (!movieId) {
-      return res.status(400).json({ message: 'Movie ID is required.' });
+      return res.status(400).json({ message: 'El ID de la pelicula es requerido.' });
     }
 
     // Find the user by ID and update the respective list
     const user = await User.findById(req.user.id);
     if (!user) {
-      return res.status(404).json({ message: 'User not found.' });
+      return res.status(404).json({ message: 'Usuario no encontrado.' });
     }
 
     // Remove the movieId from the specified list
@@ -119,20 +119,20 @@ router.post('/register', async (req, res) => {
 
   // Validate input
   if (!username || !email || !password) {
-    return res.status(400).json({ message: 'Please provide all required fields.' });
+    return res.status(400).json({ message: 'Por favor, provea todos los campos mandatorios.' });
   }
 
   try {
     // Check if user already exists by email
     const existingEmailUser = await User.findOne({ email });
     if (existingEmailUser) {
-      return res.status(400).json({ message: 'Email already exists.' });
+      return res.status(400).json({ message: 'El email ya está registrado.' });
     }
 
     // Check if user already exists by username
     const existingUsernameUser = await User.findOne({ username });
     if (existingUsernameUser) {
-      return res.status(400).json({ message: 'Username already exists.' });
+      return res.status(400).json({ message: 'El usuario ya existe.' });
     }
 
     // Hash the password
@@ -160,10 +160,10 @@ router.post('/check', async (req, res) => {
     if (existingEmailUser || existingUsernameUser) {
       let errors = {};
       if (existingEmailUser) {
-        errors.email = 'Email already exists.';
+        errors.email = 'El email ya está registrado.';
       }
       if (existingUsernameUser) {
-        errors.username = 'Username already exists.';
+        errors.username = 'El usuario ya existe.';
       }
       return res.status(400).json({ errors });
     }

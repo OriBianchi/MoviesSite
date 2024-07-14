@@ -162,13 +162,6 @@ const Login = () => {
                           <small className="text-danger">{passwordError}</small>
                         )}
                       </FormGroup>
-                      <div className="text-muted font-italic">
-                        <small>
-                          <a href="#" className="text-primary" onClick={toggleLostPasswordModal}>
-                            ¿Olvidaste tu contraseña?
-                          </a>
-                        </small>
-                      </div>
                       {loginError && (
                         <div className="text-center text-danger mb-3">
                           {loginError}

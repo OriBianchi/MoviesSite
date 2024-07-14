@@ -1,6 +1,5 @@
-// ChangePasswordModal.js
 import React, { useState, useEffect } from "react";
-import { Modal, Card, CardHeader, CardBody, FormGroup, Input, InputGroup, InputGroupAddon, InputGroupText, Button, Form, Label } from "reactstrap";
+import { Modal, Card, CardHeader, CardBody, FormGroup, Input, InputGroupAddon, InputGroupText, Button, Form, Label, InputGroup } from "reactstrap";
 
 const ChangePasswordModal = ({ isOpen, toggle, onPasswordChange }) => {
   const [oldPassword, setOldPassword] = useState("");
@@ -8,6 +7,7 @@ const ChangePasswordModal = ({ isOpen, toggle, onPasswordChange }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [validationErrors, setValidationErrors] = useState({});
   const [confirmationMessage, setConfirmationMessage] = useState("");
+  const [isClosing, setIsClosing] = useState(false);
 
   const validatePassword = (password) => {
     const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!#$%&/*+.])[A-Za-z\d!#$%&/*+.]{7,}$/;
@@ -20,24 +20,27 @@ const ChangePasswordModal = ({ isOpen, toggle, onPasswordChange }) => {
     }
   }, [isOpen]);
 
+  const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
   const clearFields = () => {
     setOldPassword("");
     setNewPassword("");
     setConfirmPassword("");
     setValidationErrors({});
     setConfirmationMessage("");
+    setIsClosing(false);
   };
 
   useEffect(() => {
     let timer;
-    if (confirmationMessage) {
+    if (isClosing) {
       timer = setTimeout(() => {
         toggle();
         clearFields();
-      }, 2000);
+      }, 3000);
     }
     return () => clearTimeout(timer);
-  }, [confirmationMessage, toggle]);
+  }, [isClosing, toggle]);
 
   const handleOldPasswordChange = (e) => {
     setOldPassword(e.target.value);
@@ -89,8 +92,10 @@ const ChangePasswordModal = ({ isOpen, toggle, onPasswordChange }) => {
       const data = await response.json();
 
       if (response.ok) {
-        setConfirmationMessage("Contraseña cambiada exitosamente");
+        setConfirmationMessage("Contraseña cambiada exitosamente.");
+        await wait(3000);
         onPasswordChange();
+        setIsClosing(true);
       } else {
         setValidationErrors({ oldPassword: data.message });
       }

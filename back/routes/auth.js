@@ -12,20 +12,20 @@ router.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
 
   if (!username || !email || !password) {
-    return res.status(400).json({ message: 'Please provide all required fields.' });
+    return res.status(400).json({ message: 'Por favor, completa todos los campos.' });
   }
 
   try {
     // Check if email already exists
     const existingEmailUser = await User.findOne({ email });
     if (existingEmailUser) {
-      return res.status(400).json({ message: 'Email already exists.' });
+      return res.status(400).json({ message: 'El email ya está registrado.' });
     }
 
     // Check if username already exists
     const existingUsernameUser = await User.findOne({ username });
     if (existingUsernameUser) {
-      return res.status(400).json({ message: 'Username already exists.' });
+      return res.status(400).json({ message: 'El usuario ya existe.' });
     }
 
     // Hash the password
@@ -51,20 +51,20 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ message: 'Please provide all required fields.' });
+    return res.status(400).json({ message: 'Por favor, completa todos los campos.' });
   }
 
   try {
     // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials.' });
+      return res.status(400).json({ message: 'Credenciales inválidas.' });
     }
 
     // Compare passwords
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Invalid credentials.' });
+      return res.status(400).json({ message: 'Credenciales inválidas.' });
     }
 
     // Generate JWT token
@@ -124,12 +124,12 @@ router.post('/change-password', auth, async (req, res) => {
     const user = await User.findById(req.user.id);
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: 'El usuario no fue encontrado.' });
     }
 
     const isMatch = await bcrypt.compare(oldPassword, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Incorrect old password' });
+      return res.status(400).json({ message: 'Contraseña antigua incorrecta.' });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -137,7 +137,7 @@ router.post('/change-password', auth, async (req, res) => {
 
     await user.save();
 
-    res.json({ message: 'Password changed successfully' });
+    res.json({ message: 'Contraseña cambiada exitosamente.' });
   } catch (err) {
     console.error(err.message);
     res.status(500).send('Server error');
